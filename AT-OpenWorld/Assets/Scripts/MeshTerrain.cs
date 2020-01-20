@@ -4,21 +4,25 @@
 public class MeshTerrain: MonoBehaviour
 {
 
-    public int xSize, zSize;
+    public int xSize, zSize, octaves;
+    public float scale, persistance, lucanarity, meshHeightMultiplier;
+    public AnimationCurve meshHeightCurve;
 
     private Mesh mesh;
     private Vector3[] vertices;
+    public float[,] noiseMap;
 
     private void Awake()
     {
+        GenerateNoiseMap();
         Generate();
+
     }
 
     private void Generate()
     {
         GetComponent<MeshFilter>().mesh = mesh = new Mesh();
         mesh.name = "Procedural Grid";
-
         vertices = new Vector3[(xSize + 1) * (zSize + 1)];
         Vector2[] uv = new Vector2[vertices.Length];
         Vector4[] tangents = new Vector4[vertices.Length];
@@ -27,8 +31,8 @@ public class MeshTerrain: MonoBehaviour
         {
             for (int x = 0; x <= xSize; x++, i++)
             {
-                float y = Mathf.PerlinNoise(x * 0.1f, z * 0.1f) * 2f;
-                vertices[i] = new Vector3(x, y, z);
+                //float y = Mathf.PerlinNoise(x * 0.1f, z * 0.1f) * 2f;
+                vertices[i] = new Vector3(x, meshHeightCurve.Evaluate(noiseMap[x, z]) * meshHeightMultiplier , z);
                 uv[i] = new Vector2((float)x / xSize, (float)z / zSize);
                 tangents[i] = tangent;
             }
@@ -50,5 +54,10 @@ public class MeshTerrain: MonoBehaviour
         }
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
+    }
+
+    void GenerateNoiseMap()
+    {
+        noiseMap = Noise.GenerateNoise((float)xSize, (float)zSize, scale, octaves, persistance, lucanarity);
     }
 }
