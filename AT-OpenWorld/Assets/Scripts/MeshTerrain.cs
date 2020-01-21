@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
 public class MeshTerrain: MonoBehaviour
 {
     public int xSize, zSize, octaves;
     public float scale, persistance, lucanarity, meshHeightMultiplier;
     public AnimationCurve meshHeightCurve;
+    MeshCollider collider;
 
     private Mesh mesh;
     private Vector3[] vertices;
@@ -23,6 +24,7 @@ public class MeshTerrain: MonoBehaviour
     private void Generate()
     {
         GetComponent<MeshFilter>().mesh = mesh = new Mesh();
+        collider = GetComponent<MeshCollider>();
         mesh.name = "Procedural Grid";
         vertices = new Vector3[(xSize + 1) * (zSize + 1)];
         Vector2[] uv = new Vector2[vertices.Length];
@@ -55,6 +57,7 @@ public class MeshTerrain: MonoBehaviour
         mesh.colors = colourMap;
         mesh.triangles = triangles;     
         mesh.RecalculateNormals();
+        collider.sharedMesh = mesh;
     }
 
     void GenerateNoiseMap()
