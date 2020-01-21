@@ -258,44 +258,70 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   xSize: 100
   zSize: 100
-  octaves: 10
-  scale: 25
+  octaves: 4
+  scale: 27.53
   persistance: 0.5
   lucanarity: 2
-  meshHeightMultiplier: 18
+  meshHeightMultiplier: 18.14
   meshHeightCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
+      inSlope: 0.0037210905
+      outSlope: 0.0037210905
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.50197
-      value: -0.0016520498
-      inSlope: 0.024512999
-      outSlope: 0.024512999
+      time: 0.35335773
+      value: 0.0013148761
+      inSlope: 0.082783975
+      outSlope: 0.082783975
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.20615807
+      inWeight: 0.2056325
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 2
-      outSlope: 2
-      tangentMode: 0
+      inSlope: 1.5444167
+      outSlope: 1.5444167
+      tangentMode: 34
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.33333334
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  colourMap: []
+  regions:
+  - name: Snow
+    height: 1
+    colour: {r: 1, g: 1, b: 1, a: 0}
+  - name: Rock
+    height: 0.8
+    colour: {r: 0.4528302, g: 0.4528302, b: 0.4528302, a: 0}
+  - name: Rock 2
+    height: 0.7
+    colour: {r: 0.11320752, g: 0.11320752, b: 0.11320752, a: 0}
+  - name: Grass
+    height: 0.6
+    colour: {r: 0, g: 0.41509432, b: 0.05901384, a: 0}
+  - name: Grass 2
+    height: 0.5
+    colour: {r: 0, g: 0.8301887, b: 0.036378395, a: 0}
+  - name: Sand
+    height: 0.45
+    colour: {r: 0.7176471, g: 0.6766836, b: 0, a: 0}
+  - name: Water
+    height: 0.4
+    colour: {r: 0, g: 0.6458513, b: 0.7169812, a: 0}
+  - name: Deep Water
+    height: 0.3
+    colour: {r: 0, g: 0.33173525, b: 0.3679245, a: 0}
 --- !u!23 &932095546
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -313,7 +339,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8f74e2b3fceea8e4ab1f38ae6fecf018, type: 2}
+  - {fileID: 2100000, guid: 39f7f319b587db349aeade2b9bf6f5ae, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
