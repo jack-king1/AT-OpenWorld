@@ -258,26 +258,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   xSize: 100
   zSize: 100
-  octaves: 4
-  scale: 27.53
+  octaves: 8
+  scale: 63.1
   persistance: 0.5
   lucanarity: 2
-  meshHeightMultiplier: 18.14
+  meshHeightMultiplier: 58.7
   meshHeightCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 0.0037210905
-      outSlope: 0.0037210905
+      inSlope: -0.011488004
+      outSlope: -0.011488004
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.35335773
-      value: 0.0013148761
+      time: 0.29729694
+      value: -0.0034153485
       inSlope: 0.082783975
       outSlope: 0.082783975
       tangentMode: 0
@@ -287,8 +287,8 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 1.5444167
-      outSlope: 1.5444167
+      inSlope: 1.4279366
+      outSlope: 1.4279366
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
@@ -314,13 +314,13 @@ MonoBehaviour:
     height: 0.5
     colour: {r: 0, g: 0.8301887, b: 0.036378395, a: 0}
   - name: Sand
-    height: 0.45
+    height: 0.35
     colour: {r: 0.7176471, g: 0.6766836, b: 0, a: 0}
   - name: Water
-    height: 0.4
+    height: 0.3
     colour: {r: 0, g: 0.6458513, b: 0.7169812, a: 0}
   - name: Deep Water
-    height: 0.3
+    height: 0.1
     colour: {r: 0, g: 0.33173525, b: 0.3679245, a: 0}
 --- !u!23 &932095546
 MeshRenderer:
