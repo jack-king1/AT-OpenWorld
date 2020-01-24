@@ -59,6 +59,13 @@ public static class Noise
                     Mathf.InverseLerp(minNoiseHeight, maxNoiseHeight, noiseMap[(int)x, (int)z]);
             }
         }
+        //DataManager.SaveNoiseMapData(noiseMap);
+        GenerateTextureFile(noiseMap, xSize, zSize);
         return noiseMap;
+    }
+
+    static void GenerateTextureFile(float[,] noiseMap, float xSize, float zSize)
+    {
+        Texture2D nm = new Texture2D((int)xSize, (int)zSize, TextureFormat.ARGB32, true);
     }
 }

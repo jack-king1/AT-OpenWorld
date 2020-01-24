@@ -3,49 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
-public class DataManager : MonoBehaviour
+
+//Create chunk
+public static class DataManager
 {
-    public ChunkData chunk;
+    static int chunkCount = 0;
 
-    public string filepath;
-
-    public void Save()
+    public static void LoadChunkData(int chunkID)
     {
+        MeshTerrain chunk = new MeshTerrain();
+        string json = File.ReadAllText(Application.dataPath + "ChunkData.json");
 
     }
 
-    public void Load()
+    public static void SaveChunkData(MeshTerrain cd)
     {
-
+        string json = JsonUtility.ToJson(cd);
+        File.WriteAllText(Application.dataPath + "/ChunkData.json", json);
+        ++chunkCount;
     }
 
-    private void WriteToFile(string fileName, string json)
+    public static void SaveNoiseMapData(float[,] noiseMap)
     {
-
-    }
-
-    private string ReadFromFile(string fileName)
-    {
-        string path = GetFilePath(fileName);
-        if(File.Exists(path))
-        {
-            using (StreamReader reader = new StreamReader(path))
-            {
-                string json = reader.ReadToEnd();
-                return json;
-            }
-
-        }
-        else
-        {
-            Debug.LogWarning("File not found!");
-        }
-
-        return "";
-    }
-
-    private string GetFilePath(string fileName)
-    {
-        return "";
+        string json = JsonUtility.ToJson(noiseMap);
+        File.WriteAllText(Application.dataPath + "/NoiseMap.json", json);
     }
 }

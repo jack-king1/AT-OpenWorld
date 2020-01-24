@@ -6,10 +6,10 @@ public class MeshTerrain: MonoBehaviour
     public int xSize, zSize, octaves;
     public float scale, persistance, lucanarity, meshHeightMultiplier;
     public AnimationCurve meshHeightCurve;
-    MeshCollider collider;
+    [SerializeField]MeshCollider collider;
 
-    private Mesh mesh;
-    private Vector3[] vertices;
+    [SerializeField]private Mesh mesh;
+    [SerializeField]private Vector3[] vertices;
     public float[,] noiseMap;
     public Color[] colourMap;
     public TerrainType[] regions;
@@ -19,6 +19,15 @@ public class MeshTerrain: MonoBehaviour
         GenerateColourMap();
         Generate();
         
+    }
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.S))
+        {
+            Debug.Log("Saveing Chunk!");
+            DataManager.SaveChunkData(gameObject.GetComponent<MeshTerrain>());
+        }
     }
 
     private void Generate()
@@ -34,7 +43,6 @@ public class MeshTerrain: MonoBehaviour
         {
             for (int x = 0; x <= xSize; x++, i++)
             {
-                //float y = Mathf.PerlinNoise(x * 0.1f, z * 0.1f) * 2f;
                 vertices[i] = new Vector3(x, meshHeightCurve.Evaluate(noiseMap[x, z]) * meshHeightMultiplier , z);
                 uv[i] = new Vector2((float)x / xSize, (float)z / zSize);
                 tangents[i] = tangent;
@@ -94,5 +102,10 @@ public class MeshTerrain: MonoBehaviour
         public string name;
         public float height;
         public Color colour;
+    }
+
+    void SaveChunk()
+    {
+
     }
 }
