@@ -7,7 +7,6 @@ public class MeshTerrain: MonoBehaviour
     public float scale, persistance, lucanarity, meshHeightMultiplier;
     public AnimationCurve meshHeightCurve;
     [SerializeField]MeshCollider collider;
-
     [SerializeField]private Mesh mesh;
     [SerializeField]private Vector3[] vertices;
     public float[,] noiseMap;
@@ -25,7 +24,7 @@ public class MeshTerrain: MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.S))
         {
-            Debug.Log("Saveing Chunk!");
+            Debug.Log("Saving Chunk!");
             DataManager.SaveChunkData(gameObject.GetComponent<MeshTerrain>());
         }
     }

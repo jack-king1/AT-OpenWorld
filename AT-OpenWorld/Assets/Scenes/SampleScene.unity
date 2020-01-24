@@ -652,7 +652,7 @@ GameObject:
   - component: {fileID: 1898896665}
   - component: {fileID: 1898896666}
   m_Layer: 0
-  m_Name: ChunkGenerator
+  m_Name: HeightMapGenerator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -684,4 +684,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd964ca3886ac954587bd3e2bfd5bbaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MapChunkSize: 6
+  xSize: 128
+  zSize: 128
+  octaves: 6
+  scale: 50
+  persistance: 0.5
+  lucanarity: 2
+  meshHeightMultiplier: 50
+  MapChunkSize: 4

@@ -12,19 +12,24 @@ public static class DataManager
     public static void LoadChunkData(int chunkID)
     {
         MeshTerrain chunk = new MeshTerrain();
-        string json = File.ReadAllText(Application.dataPath + "ChunkData.json");
+        string json = File.ReadAllText(Application.dataPath + "/StreamingAssets/ChunkData.json");
 
     }
 
     public static void SaveChunkData(MeshTerrain cd)
     {
         string json = JsonUtility.ToJson(cd);
-        File.WriteAllText(Application.dataPath + "/ChunkData.json", json);
+        File.WriteAllText(Application.dataPath + "/StreamingAssets/ChunkData.json", json);
         ++chunkCount;
     }
 
     public static void SaveNoiseMapData(byte[] bytes)
     {
-        File.WriteAllBytes(Application.dataPath + "/NoiseMap.png", bytes);
+        File.WriteAllBytes(Application.dataPath + "/StreamingAssets/NoiseMap.png", bytes);
+    }
+
+    public static void SaveNoiseMapDataTest(byte[] bytes)
+    {
+        File.WriteAllBytes(Application.dataPath + "/StreamingAssets/NoiseMapTest.png", bytes);
     }
 }
