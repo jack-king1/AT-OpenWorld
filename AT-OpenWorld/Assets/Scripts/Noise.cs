@@ -60,12 +60,30 @@ public static class Noise
             }
         }
         //DataManager.SaveNoiseMapData(noiseMap);
-        GenerateTextureFile(noiseMap, xSize, zSize);
+        GenerateTextureFile(noiseMap);
         return noiseMap;
     }
 
-    static void GenerateTextureFile(float[,] noiseMap, float xSize, float zSize)
+    static void GenerateTextureFile(float[,] noiseMap)
     {
-        Texture2D nm = new Texture2D((int)xSize, (int)zSize, TextureFormat.ARGB32, true);
+        int width = noiseMap.GetLength(0);
+        int height = noiseMap.GetLength(1); 
+
+        Texture2D nm = new Texture2D(width, height, TextureFormat.ARGB32, true);
+        Color[] colourMap = new Color[width * height];
+        for(int x = 0; x < width; ++x)
+        {
+            for(int z = 0; z < height; ++z)
+            {
+                colourMap[z * width + x] = Color.Lerp(Color.black, Color.white, noiseMap[x, z]);
+            }
+        }
+        nm.SetPixels(colourMap);
+        nm.Apply();
+        // Encode texture into PNG
+        byte[] bytes = nm.EncodeToPNG();
+        Object.Destroy(nm);
+
+        DataManager.SaveNoiseMapData(bytes);
     }
 }

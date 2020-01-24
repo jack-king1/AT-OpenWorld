@@ -287,10 +287,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 574e165195d2be04e86fd49b8d53abc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xSize: 5
-  zSize: 5
+  xSize: 128
+  zSize: 128
   octaves: 6
-  scale: 100
+  scale: 50
   persistance: 0.5
   lucanarity: 2
   meshHeightMultiplier: 50
@@ -327,6 +327,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  collider: {fileID: 0}
+  mesh: {fileID: 0}
+  vertices: []
   colourMap: []
   regions:
   - name: Snow

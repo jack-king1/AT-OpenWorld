@@ -23,9 +23,8 @@ public static class DataManager
         ++chunkCount;
     }
 
-    public static void SaveNoiseMapData(float[,] noiseMap)
+    public static void SaveNoiseMapData(byte[] bytes)
     {
-        string json = JsonUtility.ToJson(noiseMap);
-        File.WriteAllText(Application.dataPath + "/NoiseMap.json", json);
+        File.WriteAllBytes(Application.dataPath + "/NoiseMap.png", bytes);
     }
 }
