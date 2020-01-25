@@ -83,7 +83,6 @@ public static class Noise
         // Encode texture into PNG
         byte[] bytes = nm.EncodeToPNG();
         Object.Destroy(nm);
-
         DataManager.SaveNoiseMapData(bytes);
     }
 

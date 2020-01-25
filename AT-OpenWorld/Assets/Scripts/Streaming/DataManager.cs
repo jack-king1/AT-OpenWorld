@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
-
-//Create chunk
 public static class DataManager
 {
     static int chunkCount = 0;
@@ -31,5 +29,17 @@ public static class DataManager
     public static void SaveNoiseMapDataTest(byte[] bytes)
     {
         File.WriteAllBytes(Application.dataPath + "/StreamingAssets/NoiseMapTest.png", bytes);
+    }
+
+    public static void SaveAnimationCurve(AnimationCurve ac)
+    {
+        string json = JsonUtility.ToJson(ac);
+        File.WriteAllText(Application.dataPath + "/StreamingAssets/AnimationCurve.json", json);
+    }
+    public static AnimationCurve LoadAnimationCurve()
+    {
+        AnimationCurve ac = new AnimationCurve();
+        string json = File.ReadAllText(Application.dataPath + "/StreamingAssets/AnimationCurve.json");
+        return ac;
     }
 }

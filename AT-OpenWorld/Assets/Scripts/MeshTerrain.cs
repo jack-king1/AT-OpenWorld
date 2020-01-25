@@ -17,7 +17,7 @@ public class MeshTerrain: MonoBehaviour
         GenerateNoiseMap();
         GenerateColourMap();
         Generate();
-        
+        DataManager.SaveAnimationCurve(meshHeightCurve);
     }
 
     private void Update()
@@ -101,10 +101,5 @@ public class MeshTerrain: MonoBehaviour
         public string name;
         public float height;
         public Color colour;
-    }
-
-    void SaveChunk()
-    {
-
     }
 }
