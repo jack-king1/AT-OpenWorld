@@ -16,10 +16,12 @@ public class Chunk : MonoBehaviour
 
     void Awake()
     {
+        gameObject.GetComponent<MeshRenderer>().material = ColourMapData.instance.test;
         float[] dimensions = HeightMapGenerator.GetChunkDimensions();
         xSize = (int)dimensions[0];
         zSize = (int)dimensions[1];
         GetHeightMap();
+        GetColourMap();
         GenerateAnimationCurve();
         CreateMesh();
     }
@@ -43,7 +45,25 @@ public class Chunk : MonoBehaviour
 
     private void GetColourMap()
     {
+        colourMap = new Color[(xSize + 1) * (zSize + 1)];
+        int colourCount = 0;
+        for (int z = 0; z <= zSize; ++z)
+        {
+            for (int x = 0; x <= xSize; ++x)
+            {
+                float currentHeight = noiseMap[x, z];
+                for (int i = 0; i < ColourMapData.instance.regions.Length; ++i)
+                {
+                    if (currentHeight <= ColourMapData.instance.regions[i].height)
+                    {
+                        //Debug.Log("Vertex Count: " + colourCount + "Current Vertex Height: " + currentHeight + " Name: " + regions[i].name);
+                        colourMap[colourCount] = ColourMapData.instance.regions[i].colour;
+                    }
 
+                }
+                ++colourCount;
+            }
+        }
     }
 
     private void CreateMesh()
@@ -93,5 +113,10 @@ public class Chunk : MonoBehaviour
         }
         meshHeightCurve.preWrapMode = WrapMode.Clamp;
         meshHeightCurve.postWrapMode = WrapMode.Clamp;
+    }
+
+    private void SetChunkPosition()
+    {
+
     }
 }

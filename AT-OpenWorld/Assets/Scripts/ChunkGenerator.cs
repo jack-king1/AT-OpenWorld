@@ -12,7 +12,7 @@ public class ChunkGenerator : MonoBehaviour
     {
         int totalChunks = (int)chunkWidth * (int)chunkHeight;
 
-        for(int i = 0; i < totalChunks; ++i)
+        for(int i = 0; i < 4; ++i)
         {
             GameObject newChunk = new GameObject("Chunk " + i.ToString());
             newChunk.AddComponent<Chunk>();

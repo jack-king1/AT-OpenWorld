@@ -6,7 +6,6 @@ using System.IO;
 public static class DataManager
 {
     static int chunkCount = 0;
-
     public static void LoadChunkData(int chunkID)
     {
         MeshTerrain chunk = new MeshTerrain();
@@ -36,10 +35,11 @@ public static class DataManager
         string json = JsonUtility.ToJson(ac);
         File.WriteAllText(Application.dataPath + "/StreamingAssets/AnimationCurve.json", json);
     }
-    public static AnimationCurve LoadAnimationCurve()
+
+    public static Material GetVertexShader()
     {
-        AnimationCurve ac = new AnimationCurve();
-        string json = File.ReadAllText(Application.dataPath + "/StreamingAssets/AnimationCurve.json");
+        //Shader shdr = Resources.Load("/Resources/VertexColors.shader", typeof (Shader)) as Shader;
+        Material ac = Resources.Load<Material>(Application.dataPath + "Resources/Materials/VertexMat.mat");
         return ac;
     }
 }
