@@ -6,17 +6,21 @@ using System.IO;
 public static class DataManager
 {
     static int chunkCount = 0;
-    public static void LoadChunkData(int chunkID)
+    public static ChunkData LoadChunkData(int chunkID)
     {
-        MeshTerrain chunk = new MeshTerrain();
-        string json = File.ReadAllText(Application.dataPath + "/StreamingAssets/ChunkData.json");
-
+        ChunkData newChunk;
+        string json = File.ReadAllText
+            (Application.dataPath + "/StreamingAssets/ChunkData" + chunkID.ToString() + ".json");
+        Debug.Log("Creating Chunk " + chunkID);
+        newChunk = JsonUtility.FromJson<ChunkData>(json);
+        return newChunk;
     }
 
-    public static void SaveChunkData(MeshTerrain cd)
+    public static void SaveChunkData(ChunkData cd)
     {
         string json = JsonUtility.ToJson(cd);
-        File.WriteAllText(Application.dataPath + "/StreamingAssets/ChunkData.json", json);
+        File.WriteAllText
+            (Application.dataPath + "/StreamingAssets/ChunkData" + cd.chunkID.ToString() + ".json", json);
         ++chunkCount;
     }
 
@@ -41,5 +45,10 @@ public static class DataManager
         //Shader shdr = Resources.Load("/Resources/VertexColors.shader", typeof (Shader)) as Shader;
         Material ac = Resources.Load<Material>(Application.dataPath + "Resources/Materials/VertexMat.mat");
         return ac;
+    }
+
+    public static bool FileExist(int id)
+    {
+        return File.Exists(Application.dataPath + "/StreamingAssets/ChunkData" + id.ToString() + ".json");
     }
 }

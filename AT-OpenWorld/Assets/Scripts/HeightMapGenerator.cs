@@ -32,7 +32,7 @@ public class HeightMapGenerator : MonoBehaviour
         }
         else
         {
-            Noise.GenerateNoiseTest(ChunkWidth * (float)MapChunkSize, ChunkHeight * (float)MapChunkSize,
+            Noise.GenerateNoiseTest(ChunkWidth * (float)ChunkGenerator.mapChunkTotal, ChunkHeight * (float)ChunkGenerator.mapChunkTotal,
             scale, octaves, persistance, lucanarity);
             SetTexture();
         }

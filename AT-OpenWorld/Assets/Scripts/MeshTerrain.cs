@@ -22,11 +22,6 @@ public class MeshTerrain: MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.S))
-        {
-            Debug.Log("Saving Chunk!");
-            DataManager.SaveChunkData(gameObject.GetComponent<MeshTerrain>());
-        }
     }
 
     private void Generate()
