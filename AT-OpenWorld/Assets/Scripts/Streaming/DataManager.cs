@@ -11,7 +11,6 @@ public static class DataManager
         ChunkData newChunk;
         string json = File.ReadAllText
             (Application.dataPath + "/StreamingAssets/ChunkData" + chunkID.ToString() + ".json");
-        Debug.Log("Creating Chunk " + chunkID);
         newChunk = JsonUtility.FromJson<ChunkData>(json);
         return newChunk;
     }

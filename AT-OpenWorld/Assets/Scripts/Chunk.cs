@@ -12,6 +12,7 @@ public class Chunk : MonoBehaviour
     public Mesh mesh;
     public float[,] noiseMap;
     [SerializeField]private int chunkID;
+    private bool loadedFromFile;
     void Awake()
     {
         cd = new ChunkData();
@@ -19,12 +20,15 @@ public class Chunk : MonoBehaviour
         //Check to see if chunk already has json. 
         if(DataManager.FileExist(ChunkGenerator.chunkCount))
         {
-            cd = DataManager.LoadChunkData(cd.chunkID);
+            Debug.Log("Loading From File: Chunk " + ChunkGenerator.chunkCount.ToString());
+            loadedFromFile = true;
+            cd = DataManager.LoadChunkData(ChunkGenerator.chunkCount);
             gameObject.GetComponent<MeshRenderer>().material = ColourMapData.instance.mat;
             GetHeightMap();
             GenerateAnimationCurve();
             CreateMesh();
             chunkID = cd.chunkID;
+            transform.position = cd.position;
         }
         else
         {

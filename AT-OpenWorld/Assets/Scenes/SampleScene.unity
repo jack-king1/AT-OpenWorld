@@ -133,27 +133,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: c1ece6a75c5792b44994826b829185a5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 91.075584
+      value: 158.55957
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: c1ece6a75c5792b44994826b829185a5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.67
+      value: 171.9
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: c1ece6a75c5792b44994826b829185a5, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 96.91156
+      value: 54.29589
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: c1ece6a75c5792b44994826b829185a5, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: c1ece6a75c5792b44994826b829185a5, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: c1ece6a75c5792b44994826b829185a5, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: c1ece6a75c5792b44994826b829185a5, type: 3}
       propertyPath: m_LocalRotation.w
@@ -623,10 +623,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 10
-  rotateSpeed: 50
+  rotateSpeed: 99.84
   anim: {fileID: 0}
   gravity: 7
-  jumpForce: 2
+  jumpForce: 20
 --- !u!4 &1898896665 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7833331950858316757, guid: 95573460eec672b42b2b6f751261a158,
@@ -699,6 +699,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7833331950858316758, guid: 95573460eec672b42b2b6f751261a158,
+        type: 3}
+      propertyPath: scale
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 7833331950858316758, guid: 95573460eec672b42b2b6f751261a158,
+        type: 3}
+      propertyPath: meshHeightMultiplier
+      value: 50
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 95573460eec672b42b2b6f751261a158, type: 3}
