@@ -15,12 +15,12 @@ public static class DataManager
         return newChunk;
     }
 
-    public static void SaveChunkData(ChunkData cd)
+    public static void UnloadChunkData(ChunkData cd)
     {
         string json = JsonUtility.ToJson(cd);
         File.WriteAllText
             (Application.dataPath + "/StreamingAssets/ChunkData" + cd.chunkID.ToString() + ".json", json);
-        ++chunkCount;
+        //++chunkCount;
     }
 
     public static void SaveNoiseMapData(byte[] bytes)
@@ -48,6 +48,8 @@ public static class DataManager
 
     public static bool FileExist(int id)
     {
-        return File.Exists(Application.dataPath + "/StreamingAssets/ChunkData" + id.ToString() + ".json");
+        string filePath = (Application.dataPath + "/StreamingAssets/ChunkData" + id.ToString() + ".json");
+        bool exists = File.Exists(filePath);
+        return exists;
     }
 }

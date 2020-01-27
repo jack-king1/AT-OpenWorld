@@ -105,7 +105,6 @@ public static class Noise
         // Encode texture into PNG
         byte[] bytes = nm.EncodeToPNG();
         Object.Destroy(nm);
-
         DataManager.SaveNoiseMapDataTest(bytes);
     }
 
@@ -113,7 +112,6 @@ public static class Noise
     float persistance, float lacunarity)
     {
         float[,] noiseMap = new float[(int)xSize + 1, (int)zSize + 1];
-
         float maxNoiseHeight = float.MinValue;
         float minNoiseHeight = float.MaxValue;
 

@@ -20,4 +20,12 @@ public class ChunkGenerator : MonoBehaviour
             ++chunkCount;
         }
     }
+
+    public static GameObject GenerateChunk(int chunkID)
+    {
+        GameObject newChunk = new GameObject("Chunk " + chunkID.ToString());
+        newChunk.AddComponent<Chunk>();
+        newChunk.GetComponent<Chunk>().BuildChunk(chunkID);
+        return newChunk;
+    }
 }

@@ -43,9 +43,6 @@ public class HeightMapGenerator : MonoBehaviour
             HeightMap.LoadImage(heightMapData);
             HeightMapPreview = HeightMap;
         }
-
-        //once the noise map is generated we can generqate the chunks if they dont exist already.
-        ChunkGenerator.GenerateChunks(ChunkWidth, ChunkHeight);
     }
 
     public static Texture2D GetHeightMap()

@@ -15,14 +15,47 @@ public class Chunk : MonoBehaviour
     private bool loadedFromFile;
     void Awake()
     {
-        cd = new ChunkData();
+        //cd = new ChunkData();
+        ////Check to see if chunk already has json. 
+        //if(DataManager.FileExist(ChunkGenerator.chunkCount))
+        //{
+        //    Debug.Log("Loading From File: Chunk " + ChunkGenerator.chunkCount.ToString());
+        //    loadedFromFile = true;
+        //    cd = DataManager.LoadChunkData(ChunkGenerator.chunkCount);
+        //    gameObject.GetComponent<MeshRenderer>().material = ColourMapData.instance.mat;
+        //    GetHeightMap();
+        //    GenerateAnimationCurve();
+        //    CreateMesh();
+        //    chunkID = cd.chunkID;
+        //    transform.position = cd.position;
+        //}
+        //else
+        //{
+        //    cd.chunkID = ChunkGenerator.chunkCount;
+        //    gameObject.GetComponent<MeshRenderer>().material = ColourMapData.instance.mat;
+        //    float[] dimensions = HeightMapGenerator.GetChunkDimensions();
+        //    cd.xSize = (int)dimensions[0];
+        //    cd.zSize = (int)dimensions[1];
+        //    SetChunkPosition();
+        //    GetHeightMap();
+        //    GetcolourMap();
+        //    GenerateAnimationCurve();
+        //    CreateMesh();
+        //    cd.position.x = transform.position.x;
+        //    cd.position.z = transform.position.z;
+        //    CreateJSONFile();
+        //}
+    }
 
+    public void BuildChunk(int _chunkID)
+    {
+        cd = new ChunkData();
         //Check to see if chunk already has json. 
-        if(DataManager.FileExist(ChunkGenerator.chunkCount))
+        if (DataManager.FileExist(_chunkID))
         {
-            Debug.Log("Loading From File: Chunk " + ChunkGenerator.chunkCount.ToString());
+            Debug.Log("Loading From File: Chunk " + _chunkID.ToString());
             loadedFromFile = true;
-            cd = DataManager.LoadChunkData(ChunkGenerator.chunkCount);
+            cd = DataManager.LoadChunkData(_chunkID);
             gameObject.GetComponent<MeshRenderer>().material = ColourMapData.instance.mat;
             GetHeightMap();
             GenerateAnimationCurve();
@@ -32,19 +65,20 @@ public class Chunk : MonoBehaviour
         }
         else
         {
-            cd.chunkID = ChunkGenerator.chunkCount;
+            cd.chunkID = _chunkID;
+            chunkID = _chunkID;
             gameObject.GetComponent<MeshRenderer>().material = ColourMapData.instance.mat;
             float[] dimensions = HeightMapGenerator.GetChunkDimensions();
             cd.xSize = (int)dimensions[0];
             cd.zSize = (int)dimensions[1];
-            SetChunkPosition();
+            SetChunkPosition(_chunkID);
             GetHeightMap();
             GetcolourMap();
             GenerateAnimationCurve();
             CreateMesh();
             cd.position.x = transform.position.x;
             cd.position.z = transform.position.z;
-            CreateJSONObject();
+            CreateJSONFile();
         }
     }
 
@@ -53,14 +87,14 @@ public class Chunk : MonoBehaviour
         //Get height map from texture2D created from png in Noise.cs.
         Texture2D nm = HeightMapGenerator.GetHeightMap();
         noiseMap = new float[cd.xSize +1, cd.zSize+1];
-        Debug.Log("NoiseMap Size: " + noiseMap.Length);
+       // Debug.Log("NoiseMap Size: " + noiseMap.Length);
         for(int z = 0; z < cd.xSize; ++z)
         {
             for(int x = 0; x < cd.zSize; ++x)
             {
                 //int xPos = x + (ChunkGenerator.chunkCount * cd.xSize);
                 int xPos = x;
-                int zPos = z + (ChunkGenerator.chunkCount * cd.zSize);
+                int zPos = z + (cd.chunkID* cd.zSize);
                 noiseMap[x, z] = nm.GetPixel( xPos, zPos).grayscale;
             }
         }
@@ -98,6 +132,7 @@ public class Chunk : MonoBehaviour
         Vector2[] uv = new Vector2[cd.vertices.Length];
         Vector4[] tangents = new Vector4[cd.vertices.Length];
         Vector4 tangent = new Vector4(1f, 0f, 0f, -1f);
+
         for (int i = 0, z = 0; z <= cd.zSize; z++)
         {
             for (int x = 0; x <= cd.xSize; x++, i++)
@@ -138,38 +173,38 @@ public class Chunk : MonoBehaviour
         meshHeightCurve.postWrapMode = WrapMode.Clamp;
     }
 
-    private void SetChunkPosition()
+    void SetChunkPosition(int chunkID)
     {
-        //set z to moduals and rounded divion on the x
-        int count = ChunkGenerator.chunkCount;
-        float xPos = 0;
-        float offSetX;
-        if (count >= 0 && count <= 3)
-        {
-            xPos = 0;
+        //set z to moduals and rounded divison on the x
+        int rowAmount = Mathf.FloorToInt(Mathf.Sqrt(ChunkGenerator.mapChunkTotal));
+        int value = Mathf.FloorToInt(ChunkGenerator.mapChunkTotal / chunkID + 1);
+        int xPos = Mathf.FloorToInt(rowAmount / value) -1;
 
-        }
-        else if(count >= 4 && count <= 7)
-        {
-            xPos = 1;
-        }
-        else if (count >= 8 && count <= 11)
-        {
-            xPos = 2;
-        }
-        else if (count >= 12 && count <= 15)
-        {
-            xPos = 3;
-        }
-
-        float offsetZ = (ChunkGenerator.chunkCount % Mathf.Sqrt(ChunkGenerator.mapChunkTotal));
+        float offsetZ = (chunkID % Mathf.Sqrt(ChunkGenerator.mapChunkTotal));
         Vector3 newPos = new Vector3(cd.xSize * xPos, 0, cd.zSize * offsetZ);
         gameObject.transform.position = newPos;
         cd.position = newPos;
     }
 
-    void CreateJSONObject()
+    void UnloadChunk()
     {
-        DataManager.SaveChunkData(this.cd);
+        DataManager.UnloadChunkData(this.cd);
+        Destroy(this.gameObject);
+    }
+
+    void CreateJSONFile()
+    {
+        DataManager.UnloadChunkData(this.cd);
+    }
+
+    void ChunkOffset()
+    {
+         //Get ROW amount
+        //total chunks / chunk id = value
+        // sqrt(Total chunks) / value
+
+        int rowAmount = Mathf.FloorToInt(Mathf.Sqrt(ChunkGenerator.mapChunkTotal));
+        int value = Mathf.FloorToInt(ChunkGenerator.mapChunkTotal / cd.chunkID);
+        int row = value;
     }
 }
