@@ -13,39 +13,6 @@ public class Chunk : MonoBehaviour
     public float[,] noiseMap;
     [SerializeField]private int chunkID;
     private bool loadedFromFile;
-    void Awake()
-    {
-        //cd = new ChunkData();
-        ////Check to see if chunk already has json. 
-        //if(DataManager.FileExist(ChunkGenerator.chunkCount))
-        //{
-        //    Debug.Log("Loading From File: Chunk " + ChunkGenerator.chunkCount.ToString());
-        //    loadedFromFile = true;
-        //    cd = DataManager.LoadChunkData(ChunkGenerator.chunkCount);
-        //    gameObject.GetComponent<MeshRenderer>().material = ColourMapData.instance.mat;
-        //    GetHeightMap();
-        //    GenerateAnimationCurve();
-        //    CreateMesh();
-        //    chunkID = cd.chunkID;
-        //    transform.position = cd.position;
-        //}
-        //else
-        //{
-        //    cd.chunkID = ChunkGenerator.chunkCount;
-        //    gameObject.GetComponent<MeshRenderer>().material = ColourMapData.instance.mat;
-        //    float[] dimensions = HeightMapGenerator.GetChunkDimensions();
-        //    cd.xSize = (int)dimensions[0];
-        //    cd.zSize = (int)dimensions[1];
-        //    SetChunkPosition();
-        //    GetHeightMap();
-        //    GetcolourMap();
-        //    GenerateAnimationCurve();
-        //    CreateMesh();
-        //    cd.position.x = transform.position.x;
-        //    cd.position.z = transform.position.z;
-        //    CreateJSONFile();
-        //}
-    }
 
     public void BuildChunk(int _chunkID)
     {
@@ -92,8 +59,7 @@ public class Chunk : MonoBehaviour
         {
             for(int x = 0; x < cd.zSize; ++x)
             {
-                //int xPos = x + (ChunkGenerator.chunkCount * cd.xSize);
-                int xPos = x;
+                int xPos = x + (cd.chunkID * cd.xSize);
                 int zPos = z + (cd.chunkID* cd.zSize);
                 noiseMap[x, z] = nm.GetPixel( xPos, zPos).grayscale;
             }
@@ -175,13 +141,20 @@ public class Chunk : MonoBehaviour
 
     void SetChunkPosition(int chunkID)
     {
-        //set z to moduals and rounded divison on the x
-        int rowAmount = Mathf.FloorToInt(Mathf.Sqrt(ChunkGenerator.mapChunkTotal));
-        int value = Mathf.FloorToInt(ChunkGenerator.mapChunkTotal / chunkID + 1);
-        int xPos = Mathf.FloorToInt(rowAmount / value) -1;
+        float rowAmount = Mathf.Sqrt(ChunkGenerator.mapChunkTotal);
+        float x = 0;
+        float z = 0;
+        if (chunkID == 0)
+        {
+            x = 0;
+        }
+        else
+        {
+            x = Mathf.FloorToInt((float)(chunkID) / rowAmount);
+            z = (chunkID) % rowAmount;
+        }
 
-        float offsetZ = (chunkID % Mathf.Sqrt(ChunkGenerator.mapChunkTotal));
-        Vector3 newPos = new Vector3(cd.xSize * xPos, 0, cd.zSize * offsetZ);
+        Vector3 newPos = new Vector3(x * cd.xSize, 0, z * cd.zSize);
         gameObject.transform.position = newPos;
         cd.position = newPos;
     }
@@ -200,8 +173,8 @@ public class Chunk : MonoBehaviour
     void ChunkOffset()
     {
          //Get ROW amount
-        //total chunks / chunk id = value
-        // sqrt(Total chunks) / value
+         //Col = totalchunks / chunkID + 1
+         //offsetCol = Mathf.floortoint(col);
 
         int rowAmount = Mathf.FloorToInt(Mathf.Sqrt(ChunkGenerator.mapChunkTotal));
         int value = Mathf.FloorToInt(ChunkGenerator.mapChunkTotal / cd.chunkID);
