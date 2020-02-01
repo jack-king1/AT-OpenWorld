@@ -8,6 +8,7 @@ public static class Noise
         float persistance, float lacunarity)
     {
         float[,] noiseMap = new float[(int)xSize + 1,(int)zSize + 1];
+        float[,] fallOffMap = FallOffGenerator.GenerateFallOffMap((int)xSize);
 
         float maxNoiseHeight = float.MinValue;
         float minNoiseHeight = float.MaxValue;
@@ -162,7 +163,21 @@ public static class Noise
                     Mathf.InverseLerp(minNoiseHeight, maxNoiseHeight, noiseMap[(int)x, (int)z]);
             }
         }
-        //DataManager.SaveNoiseMapData(noiseMap);
+        CircularFallOff((int)xSize, ref noiseMap);
         GenerateTextureFileTest(noiseMap);
+    }
+
+    static void CircularFallOff(int size, ref float[,] noiseMap)
+    {
+        float[,] fallOffMap = FallOffGenerator.GenerateFallOffMap(size);
+        for(int x = 0; x < size; ++x)
+        {
+            for (int z = 0; z < size; ++z)
+            {
+                float nm = noiseMap[x, z];
+                float fm = fallOffMap[x, z];
+                noiseMap[x, z] = Mathf.Clamp01(noiseMap[x, z] - fallOffMap[x, z]);
+            }
+        }
     }
 }

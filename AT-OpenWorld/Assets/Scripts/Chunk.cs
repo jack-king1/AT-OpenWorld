@@ -55,12 +55,12 @@ public class Chunk : MonoBehaviour
         Texture2D nm = HeightMapGenerator.GetHeightMap();
         noiseMap = new float[cd.xSize +1, cd.zSize+1];
        // Debug.Log("NoiseMap Size: " + noiseMap.Length);
-        for(int z = 0; z < cd.xSize; ++z)
+        for(int x = 0; x < cd.xSize; ++x)
         {
-            for(int x = 0; x < cd.zSize; ++x)
+            for(int z = 0; z < cd.zSize; ++z)
             {
-                int xPos = x + (cd.chunkID * cd.xSize);
-                int zPos = z + (cd.chunkID* cd.zSize);
+                int xPos = x + ((int)cd.offset.x * cd.xSize);
+                int zPos = z + ((int)cd.offset.y * cd.zSize);
                 noiseMap[x, z] = nm.GetPixel( xPos, zPos).grayscale;
             }
         }
@@ -153,6 +153,9 @@ public class Chunk : MonoBehaviour
             x = Mathf.FloorToInt((float)(chunkID) / rowAmount);
             z = (chunkID) % rowAmount;
         }
+
+        cd.offset = new Vector2(x, z);
+
 
         Vector3 newPos = new Vector3(x * cd.xSize, 0, z * cd.zSize);
         gameObject.transform.position = newPos;

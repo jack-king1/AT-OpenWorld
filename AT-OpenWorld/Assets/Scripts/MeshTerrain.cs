@@ -82,8 +82,7 @@ public class MeshTerrain: MonoBehaviour
                     {
                         //Debug.Log("Vertex Count: " + colourCount + "Current Vertex Height: " + currentHeight + " Name: " + regions[i].name);
                         colourMap[colourCount] = regions[i].colour;
-                    }
-                    
+                    }        
                 }
                 ++colourCount;
             }

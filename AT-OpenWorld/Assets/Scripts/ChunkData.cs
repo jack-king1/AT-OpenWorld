@@ -6,6 +6,7 @@ public class ChunkData
 {
     public int chunkID;
     public int xSize, zSize;
+    public Vector2 offset;
     public float meshHeightMultiplier = 100;
     public Vector3[] vertices;
     public Color[] colourMap;
