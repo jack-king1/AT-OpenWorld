@@ -28,9 +28,9 @@ public static class DataManager
         File.WriteAllBytes(Application.dataPath + "/StreamingAssets/NoiseMap.png", bytes);
     }
 
-    public static void SaveNoiseMapDataTest(byte[] bytes)
+    public static void SaveNoiseMapData(byte[] bytes, string fileName)
     {
-        File.WriteAllBytes(Application.dataPath + "/StreamingAssets/NoiseMapTest.png", bytes);
+        File.WriteAllBytes(Application.dataPath + "/StreamingAssets/" + fileName + ".png", bytes);
     }
 
     public static void SaveAnimationCurve(AnimationCurve ac)

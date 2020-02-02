@@ -747,12 +747,12 @@ PrefabInstance:
     - target: {fileID: 7833331950858316758, guid: 95573460eec672b42b2b6f751261a158,
         type: 3}
       propertyPath: scale
-      value: 200
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 7833331950858316758, guid: 95573460eec672b42b2b6f751261a158,
         type: 3}
       propertyPath: meshHeightMultiplier
-      value: 50
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 7833331950858316758, guid: 95573460eec672b42b2b6f751261a158,
         type: 3}

@@ -15,7 +15,7 @@ public class HeightMapGenerator : MonoBehaviour
     void Start()
     {
         byte[] heightMapData;
-        if(File.Exists(Application.dataPath + "/StreamingAssets/NoiseMapTest.png"))
+        if(File.Exists(Application.dataPath + "/StreamingAssets/NoiseMap.png"))
         {
             SetTexture();
         }
@@ -28,7 +28,7 @@ public class HeightMapGenerator : MonoBehaviour
         void SetTexture()
         {
             HeightMap = new Texture2D((int)ChunkWidth, (int)ChunkHeight, TextureFormat.ARGB32, true);
-            heightMapData = File.ReadAllBytes(Application.dataPath + "/StreamingAssets/NoiseMapTest.png");
+            heightMapData = File.ReadAllBytes(Application.dataPath + "/StreamingAssets/NoiseMap.png");
             HeightMap.LoadImage(heightMapData);
             HeightMapPreview = HeightMap;
         }

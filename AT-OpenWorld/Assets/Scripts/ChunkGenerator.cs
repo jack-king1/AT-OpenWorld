@@ -6,7 +6,7 @@ public class ChunkGenerator : MonoBehaviour
 {
     public static int chunkCount;
     public static List<GameObject> chunkPreviewList;
-    public static int mapChunkTotal = 4;
+    public static int mapChunkTotal = 400;
 
 
     public static void GenerateChunks(float chunkWidth, float chunkHeight)

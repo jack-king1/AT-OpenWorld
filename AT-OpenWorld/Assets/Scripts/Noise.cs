@@ -65,7 +65,7 @@ public static class Noise
         return noiseMap;
     }
 
-    static void GenerateTextureFile(float[,] noiseMap)
+    public static void GenerateTextureFile(float[,] noiseMap)
     {
         int width = noiseMap.GetLength(0);
         int height = noiseMap.GetLength(1); 
@@ -87,7 +87,7 @@ public static class Noise
         DataManager.SaveNoiseMapData(bytes);
     }
 
-    static void GenerateTextureFileTest(float[,] noiseMap)
+    public static void GenerateTextureFileName(float[,] noiseMap, string name)
     {
         int width = noiseMap.GetLength(0);
         int height = noiseMap.GetLength(1);
@@ -106,7 +106,7 @@ public static class Noise
         // Encode texture into PNG
         byte[] bytes = nm.EncodeToPNG();
         Object.Destroy(nm);
-        DataManager.SaveNoiseMapDataTest(bytes);
+        DataManager.SaveNoiseMapData(bytes, name);
     }
 
     public static void GenerateNoiseTest(float xSize, float zSize, float scale, int octaves,
@@ -164,7 +164,7 @@ public static class Noise
             }
         }
         CircularFallOff((int)xSize, ref noiseMap);
-        GenerateTextureFileTest(noiseMap);
+        GenerateTextureFile(noiseMap);
     }
 
     static void CircularFallOff(int size, ref float[,] noiseMap)

@@ -82,7 +82,6 @@ public class Chunk : MonoBehaviour
                         //Debug.Log("Vertex Count: " + colourCount + "Current Vertex Height: " + currentHeight + " Name: " + regions[i].name);
                         cd.colourMap[colourCount] = ColourMapData.instance.regions[i].colour;
                     }
-
                 }
                 ++colourCount;
             }
@@ -171,16 +170,5 @@ public class Chunk : MonoBehaviour
     void CreateJSONFile()
     {
         DataManager.UnloadChunkData(this.cd);
-    }
-
-    void ChunkOffset()
-    {
-         //Get ROW amount
-         //Col = totalchunks / chunkID + 1
-         //offsetCol = Mathf.floortoint(col);
-
-        int rowAmount = Mathf.FloorToInt(Mathf.Sqrt(ChunkGenerator.mapChunkTotal));
-        int value = Mathf.FloorToInt(ChunkGenerator.mapChunkTotal / cd.chunkID);
-        int row = value;
     }
 }

@@ -14,9 +14,12 @@ public class LoadUnloadTest : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.O))
         {
             //Opening File
-            Debug.Log("Loading File");
-            chunkTest = ChunkGenerator.GenerateChunk(count);
-            count++;
+            for(int i = 0; i < (ChunkGenerator.mapChunkTotal / 4); ++i)
+            {
+                chunkTest = ChunkGenerator.GenerateChunk(count);
+                count++;
+
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.U))
