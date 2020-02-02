@@ -18,7 +18,6 @@ public class LoadUnloadTest : MonoBehaviour
             {
                 chunkTest = ChunkGenerator.GenerateChunk(count);
                 count++;
-
             }
         }
 
