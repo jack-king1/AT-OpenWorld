@@ -21,10 +21,11 @@ public class HeightMapGenerator : MonoBehaviour
         }
         else
         {
-            Noise.GenerateNoiseTest(ChunkWidth * Mathf.Sqrt((float)ChunkGenerator.mapChunkTotal), ChunkHeight * Mathf.Sqrt((float)ChunkGenerator.mapChunkTotal),
+            Noise.GenerateNoiseTest(ChunkWidth * Mathf.Sqrt((float)ChunkManager.instance.mapChunkTotal), ChunkHeight * Mathf.Sqrt((float)ChunkManager.instance.mapChunkTotal),
             scale, octaves, persistance, lucanarity);
             SetTexture();
         }
+
         void SetTexture()
         {
             HeightMap = new Texture2D((int)ChunkWidth, (int)ChunkHeight, TextureFormat.ARGB32, true);

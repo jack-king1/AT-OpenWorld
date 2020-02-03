@@ -6,9 +6,11 @@ public class PlayerInput : MonoBehaviour
 {
     movement playerMovement;
     float mouseSpeed = 3;
+    PlayerData pd;
     private void Start()
     {
         playerMovement = GetComponent<movement>();
+        pd = new PlayerData();
     }
 
     private void Update()

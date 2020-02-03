@@ -14,9 +14,9 @@ public class LoadUnloadTest : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.O))
         {
             //Opening File
-            for(int i = 0; i < (ChunkGenerator.mapChunkTotal / 4); ++i)
+            for(int i = 0; i < (ChunkManager.instance.mapChunkTotal / 4); ++i)
             {
-                chunkTest = ChunkGenerator.GenerateChunk(count);
+                chunkTest = ChunkManager.instance.GenerateChunk(count);
                 count++;
             }
         }
@@ -26,6 +26,12 @@ public class LoadUnloadTest : MonoBehaviour
             Debug.Log("Unlaoding File");
             DataManager.UnloadChunkData(chunkTest.GetComponent<ChunkData>());
             Destroy(chunkTest.gameObject);
+        }
+
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+
+                chunkTest = ChunkManager.instance.GenerateChunk(ChunkManager.instance.startChunk);
         }
     }
 }
