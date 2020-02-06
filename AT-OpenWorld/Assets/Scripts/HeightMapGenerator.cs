@@ -5,8 +5,8 @@ using System.IO;
 
 public class HeightMapGenerator : MonoBehaviour
 {
-    private static float ChunkWidth = 128f;
-    private static float ChunkHeight = 128f;
+    private static float ChunkWidth = 64f;
+    private static float ChunkHeight = 64f;
     public int xSize, zSize, octaves;
     public float scale, persistance, lucanarity, meshHeightMultiplier;
     public static Texture2D HeightMap;
