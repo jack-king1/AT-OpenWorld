@@ -37,7 +37,7 @@ public class ChunkManager : MonoBehaviour
                 //Check to see if chunk is within distance of player to be rendered if npot delete it/unload it
                 Chunk chunkObject = chunk.GetComponent<Chunk>();
                 if (Vector3.Distance(PlayerManager.instance.GetPlayer().gameObject.transform.position,
-                    chunkObject.GetWorldSpaceBounds().center) > 128 )
+                    chunkObject.GetWorldSpaceBounds().center) > 560 )
                 {
                     Debug.Log("Deleting Chunk");
                     //Call chunk unload here
@@ -100,7 +100,7 @@ public class ChunkManager : MonoBehaviour
         newChunk.AddComponent<Chunk>();
         newChunk.GetComponent<Chunk>().BuildChunk(chunkID);
         activeChunks.Add(newChunk);
-        return newChunk;   
+        return newChunk;
     }
 
     bool chunkExists(int n)
@@ -112,7 +112,6 @@ public class ChunkManager : MonoBehaviour
                 return false;
             }
         }
-
         return true;
     }
 }

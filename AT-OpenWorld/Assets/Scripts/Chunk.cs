@@ -181,6 +181,7 @@ public class Chunk : MonoBehaviour
     void SetChunkNeighbours()
     {
         int size = (int)Mathf.Sqrt(ChunkManager.instance.mapChunkTotal);
+        
         cd.chunkNeighbour = new int[8];
         cd.chunkNeighbour[(int)directions.N] = cd.chunkID + 1;
         cd.chunkNeighbour[(int)directions.S] = cd.chunkID - 1;
@@ -191,54 +192,85 @@ public class Chunk : MonoBehaviour
         cd.chunkNeighbour[(int)directions.SE] = (cd.chunkID - 1) + size;
         cd.chunkNeighbour[(int)directions.NW] = (cd.chunkID + 1) - size;
 
-        if(cd.offset.x == 0)
+        size -= 1;
+        if (cd.offset.x == 0 || cd.offset.y == 0 ||
+            cd.offset.x == size || cd.offset.y == size)
         {
-            cd.chunkNeighbour[(int)directions.NW] = -1;
-            cd.chunkNeighbour[(int)directions.W] = -1;
-            cd.chunkNeighbour[(int)directions.SW] = -1;
-            if (cd.offset.x == 0 && cd.offset.y == 0)
+            if(cd.offset.x == 0)
             {
-                cd.chunkNeighbour[(int)directions.S] = -1;
-                cd.chunkNeighbour[(int)directions.SE] = -1;
+                if (cd.offset.y == 0)
+                {
+                    //bottomleft corner.
+                    cd.chunkNeighbour[(int)directions.NW] = -1;
+                    cd.chunkNeighbour[(int)directions.SE] = -1;
+                    cd.chunkNeighbour[(int)directions.S] = -1;
+                    cd.chunkNeighbour[(int)directions.SW] = -1;
+                    cd.chunkNeighbour[(int)directions.W] = -1;
+                }
+                else if (cd.offset.y == size)
+                {
+                    //topleft corner.
+                    cd.chunkNeighbour[(int)directions.N] = -1;
+                    cd.chunkNeighbour[(int)directions.NE] = -1;
+                    cd.chunkNeighbour[(int)directions.SW] = -1;
+                    cd.chunkNeighbour[(int)directions.W] = -1;
+                    cd.chunkNeighbour[(int)directions.NW] = -1;
+                }
+                else if (cd.offset.y > 0)
+                {
+                    //Middle Left
+                    cd.chunkNeighbour[(int)directions.W] = -1;
+                    cd.chunkNeighbour[(int)directions.SW] = -1;
+                    cd.chunkNeighbour[(int)directions.NW] = -1;
+                }
             }
-
-            if(cd.offset.x == 3 && cd.offset.y == 0)
+            else if(cd.offset.x == size)
             {
-                cd.chunkNeighbour[(int)directions.NW] = -1;
-                cd.chunkNeighbour[(int)directions.N] = -1;
+                if (cd.offset.y == 0)
+                {
+                    //Bottomright corner.
+                    cd.chunkNeighbour[(int)directions.NE] = -1;
+                    cd.chunkNeighbour[(int)directions.E] = -1;
+                    cd.chunkNeighbour[(int)directions.SE] = -1;
+                    cd.chunkNeighbour[(int)directions.S] = -1;
+                    cd.chunkNeighbour[(int)directions.SW] = -1;
+                }
+                else if (cd.offset.y == size)
+                {
+                    //Topright corner.
+                    cd.chunkNeighbour[(int)directions.N] = -1;
+                    cd.chunkNeighbour[(int)directions.NE] = -1;
+                    cd.chunkNeighbour[(int)directions.E] = -1;
+                    cd.chunkNeighbour[(int)directions.NW] = -1;
+                    cd.chunkNeighbour[(int)directions.SE] = -1;
+                }
+                else if (cd.offset.y > 0)
+                {
+                    //Middle right
+                    cd.chunkNeighbour[(int)directions.NE] = -1;
+                    cd.chunkNeighbour[(int)directions.E] = -1;
+                    cd.chunkNeighbour[(int)directions.SE] = -1;
+                }
             }
-        }
-
-        if(cd.offset.x == 3)
-        {
-            cd.chunkNeighbour[(int)directions.N] = -1;
-            cd.chunkNeighbour[(int)directions.NW] = -1;
-            cd.chunkNeighbour[(int)directions.W] = -1;
-        }
-
-        if(cd.offset.y == 0)
-        {
-            cd.chunkNeighbour[(int)directions.S] = -1;
-            cd.chunkNeighbour[(int)directions.SW] = -1;
-            cd.chunkNeighbour[(int)directions.SE] = -1;
-        }
-
-        if (cd.offset.y == 3)
-        {
-            cd.chunkNeighbour[(int)directions.NE] = -1;
-            cd.chunkNeighbour[(int)directions.E] = -1;
-            cd.chunkNeighbour[(int)directions.SE] = -1;
-
-            if(cd.offset.x == 0 && cd.offset.y == 3)
+            else if(cd.offset.y == 0)
             {
-                cd.chunkNeighbour[(int)directions.S] = -1;
-                cd.chunkNeighbour[(int)directions.SW] = -1;
+                if(cd.offset.x > 0)
+                {
+                    //middle bottom aka 3
+                    cd.chunkNeighbour[(int)directions.SE] = -1;
+                    cd.chunkNeighbour[(int)directions.SW] = -1;
+                    cd.chunkNeighbour[(int)directions.S] = -1;
+                }
             }
-
-            if (cd.offset.x == 3 && cd.offset.y == 3)
+            else if(cd.offset.y == size)
             {
-                cd.chunkNeighbour[(int)directions.N] = -1;
-                cd.chunkNeighbour[(int)directions.NE] = -1;
+                if (cd.offset.x > 0)
+                {
+                    //middle Top
+                    cd.chunkNeighbour[(int)directions.N] = -1;
+                    cd.chunkNeighbour[(int)directions.NE] = -1;
+                    cd.chunkNeighbour[(int)directions.NW] = -1;
+                }
             }
         }
     }

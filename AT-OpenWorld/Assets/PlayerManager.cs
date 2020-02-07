@@ -24,7 +24,7 @@ public class PlayerManager : MonoBehaviour
     public void SpawnPlayer()
     {
         Vector3 position = ChunkManager.instance.activeChunks[0].GetComponent<Chunk>().GetWorldSpaceBounds().center;
-        position = new Vector3(position.x, 100, position.z);
+        position = new Vector3(position.x, 32, position.z);
         Player = Instantiate(playerPrefab, position,
             Quaternion.identity);
     }
