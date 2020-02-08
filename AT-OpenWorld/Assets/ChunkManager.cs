@@ -9,7 +9,7 @@ public class ChunkManager : MonoBehaviour
     public int chunkCount;
     public int mapChunkTotal = 16;
     public int startChunk;
-    private int playerActiveChunk;
+    [SerializeField] private int playerActiveChunk;
     private bool newActiveChunk = true;
     private Chunk activeChunk;
 
@@ -98,7 +98,7 @@ public class ChunkManager : MonoBehaviour
         //Check if chunk doesnt exist.
         GameObject newChunk = new GameObject("Chunk " + chunkID.ToString());
         newChunk.AddComponent<Chunk>();
-        newChunk.GetComponent<Chunk>().BuildChunk(chunkID);
+        StartCoroutine(newChunk.GetComponent<Chunk>().BuildChunk(chunkID));
         activeChunks.Add(newChunk);
         return newChunk;
     }

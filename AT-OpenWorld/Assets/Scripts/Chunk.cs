@@ -14,7 +14,7 @@ public class Chunk : MonoBehaviour
     [SerializeField]private int chunkID;
     private bool loadedFromFile;
 
-    public void BuildChunk(int _chunkID)
+    public IEnumerator BuildChunk(int _chunkID)
     {
         cd = new ChunkData();
         //Check to see if chunk already has json. 
@@ -47,7 +47,9 @@ public class Chunk : MonoBehaviour
             cd.position.z = transform.position.z;
             SetChunkNeighbours();
             CreateJSONFile();
+
         }
+            yield break;
     }
 
     private void GetHeightMap()
@@ -66,7 +68,6 @@ public class Chunk : MonoBehaviour
             }
         }
     }
-
     private void GetcolourMap()
     {
         cd.colourMap = new Color[(cd.xSize + 1) * (cd.zSize + 1)];
@@ -155,7 +156,6 @@ public class Chunk : MonoBehaviour
         }
 
         cd.offset = new Vector2(x, z);
-
 
         Vector3 newPos = new Vector3(x * cd.xSize, 0, z * cd.zSize);
         gameObject.transform.position = newPos;

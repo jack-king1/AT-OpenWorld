@@ -435,7 +435,7 @@ PrefabInstance:
     - target: {fileID: 7438663532539850221, guid: d09867fe18ee629419e155221d2a1261,
         type: 3}
       propertyPath: mapChunkTotal
-      value: 9
+      value: 36
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d09867fe18ee629419e155221d2a1261, type: 3}
