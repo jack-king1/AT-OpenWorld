@@ -11,7 +11,7 @@ public class ChunkManager : MonoBehaviour
     public int startChunk;
     [SerializeField] private int playerActiveChunk;
     private bool newActiveChunk = true;
-    private Chunk activeChunk;
+    public Chunk activeChunk;
 
 
     private void Awake()
@@ -54,6 +54,7 @@ public class ChunkManager : MonoBehaviour
                     {
                         if(activeChunks[i].GetComponent<Chunk>().cd.chunkID == playerActiveChunk)
                         {
+                            Debug.Log("New Active Chunk:" + activeChunks[i].GetComponent<Chunk>().cd.chunkID);
                             activeChunk = activeChunks[i].GetComponent<Chunk>();
                         }
                     }
