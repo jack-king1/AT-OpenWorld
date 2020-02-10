@@ -19,10 +19,7 @@ public class StartGame : MonoBehaviour
             timer -= Time.deltaTime;
         }
         else
-        {
-            ChunkManager.instance.GenerateChunk(ChunkManager.instance.startChunk);
-            
-            
+        {          
             PlayerManager.instance.SpawnPlayer();
             Destroy(this);
         }   

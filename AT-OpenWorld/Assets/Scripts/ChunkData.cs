@@ -4,14 +4,16 @@ using UnityEngine;
 
 public class ChunkData 
 {
-    public int chunkID;
-    public int xSize, zSize;
-    public Vector2 offset;
-    public float meshHeightMultiplier = 100;
+    public int size;
     public Vector3[] vertices;
-    public Color[] colourMap;
     public Vector3 position;
-    public int[] chunkNeighbour;
+    public Vector2 arrayPos;
+    public Vector2[] chunkNeighbour;
+    public Color[] meshColor;
+    public Vector2[] uv;
+    public Vector4[] tangents;
+    public Vector4 tangent;
+    public int[] triangles;
 }
 
 [System.Serializable]

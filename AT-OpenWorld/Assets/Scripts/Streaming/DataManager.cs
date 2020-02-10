@@ -6,11 +6,11 @@ using System.IO;
 public static class DataManager
 {
     static int chunkCount = 0;
-    public static ChunkData LoadChunkData(int chunkID)
+    public static ChunkData LoadChunkData(int x, int z)
     {
         ChunkData newChunk;
         string json = File.ReadAllText
-            (Application.dataPath + "/StreamingAssets/ChunkData" + chunkID.ToString() + ".json");
+            (Application.dataPath + "/StreamingAssets/ChunkData" + x.ToString() + z.ToString() + ".json");
         newChunk = JsonUtility.FromJson<ChunkData>(json);
         return newChunk;
     }
@@ -19,7 +19,7 @@ public static class DataManager
     {
         string json = JsonUtility.ToJson(cd);
         File.WriteAllText
-            (Application.dataPath + "/StreamingAssets/ChunkData" + cd.chunkID.ToString() + ".json", json);
+            (Application.dataPath + "/StreamingAssets/ChunkData" + cd.arrayPos.x.ToString() + cd.arrayPos.y.ToString() + ".json", json);
         //++chunkCount;
     }
 
@@ -46,9 +46,9 @@ public static class DataManager
         return ac;
     }
 
-    public static bool FileExist(int id)
+    public static bool FileExist(int x, int z)
     {
-        string filePath = (Application.dataPath + "/StreamingAssets/ChunkData" + id.ToString() + ".json");
+        string filePath = (Application.dataPath + "/StreamingAssets/ChunkData" + x.ToString() + z.ToString() + ".json");
         bool exists = File.Exists(filePath);
         return exists;
     }

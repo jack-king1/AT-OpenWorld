@@ -8,7 +8,7 @@ public class CreateChunk : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.C))
         {
-            DataManager.LoadChunkData(0);
+            DataManager.LoadChunkData(0,0);
         }
     }
 }
