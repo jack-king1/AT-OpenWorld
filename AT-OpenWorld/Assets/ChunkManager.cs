@@ -29,16 +29,7 @@ public class ChunkManager : MonoBehaviour
     void Start()
     {
         int size = (int)Mathf.Sqrt(mapChunkTotal);
-        //for(int x = 0; x < size; ++x)
-        //{
-        //    for (int z = 0; z < size; ++z)
-        //    {
-        //        GenerateChunk(x,z);
-        //    }
-        //}
-
         GenerateChunk(1, 1);
-
         activeChunk = activeChunks[0].GetComponent<Chunk>();
         newActiveChunk = true;
     }
@@ -82,10 +73,11 @@ public class ChunkManager : MonoBehaviour
 
     public GameObject GenerateChunk(int x, int z)
     {
-        //Check if chunk doesnt exist.
+        //Check if chunk doesn't exist.
         GameObject newChunk = new GameObject("Chunk " + x.ToString() + z.ToString());
         newChunk.AddComponent<Chunk>();
-        StartCoroutine(newChunk.GetComponent<Chunk>().BuildChunk(x, z));
+        newChunk.GetComponent<Chunk>().chunkArrayPos = new Vector2(x,z);
+        newChunk.GetComponent<Chunk>().BuildChunk(x, z);
         activeChunks.Add(newChunk);
         return newChunk;
     }

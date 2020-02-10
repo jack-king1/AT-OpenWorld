@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using System.Threading;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
 public class Chunk : MonoBehaviour
@@ -8,41 +10,48 @@ public class Chunk : MonoBehaviour
     public ChunkData cd;
     [SerializeField] MeshCollider collider;
     public Mesh mesh;
-    [SerializeField]private int chunkID;
+    [SerializeField] public Vector2 chunkArrayPos;
+    public Thread LoadChunk;
+    SerializableMeshInfo smi;
 
-    public IEnumerator BuildChunk(int x, int z)
+    private void Start()
+    {
+
+    }
+
+    public void BuildChunk(int x, int z)
     {
         cd = new ChunkData();
         //Check to see if chunk already has json.
-        if (DataManager.FileExist(x,z))
-        {
-            gameObject.GetComponent<MeshRenderer>().material = ColourMapData.instance.mat;
-            Debug.Log("Loading From File: Chunk " + x + z);
-            cd = DataManager.LoadChunkData(x,z);
-            CreateMeshFromFile();
-            transform.position = cd.position;
-        }
-        else
-        {
-            gameObject.GetComponent<MeshRenderer>().material = ColourMapData.instance.mat;
-            cd.size = 128;
-            SetChunkPosition(x,z);
-            GetcolourMap();
-            CreateMesh();
-            cd.position.x = transform.position.x;
-            cd.position.z = transform.position.z;
-            SetChunkNeighbours();
-            CreateJSONFile();
+        //if (DataManager.FileExist((int)chunkArrayPos.x, (int)chunkArrayPos.y))
+        //{
+        //    gameObject.GetComponent<MeshRenderer>().material = ColourMapData.instance.mat;
+        //    Debug.Log("Loading From File: Chunk " + chunkArrayPos);
+        //    DataManager.LoadChunkData((int)chunkArrayPos.x, (int)chunkArrayPos.y);
+        //    CreateMeshFromFile();
+        //    transform.position = cd.position;
+        //}
+        //else
+        //{
+        gameObject.GetComponent<MeshRenderer>().material = ColourMapData.instance.mat;
+        cd.size = 128;
+        SetChunkPosition(x,z);
+        GetcolourMap();
+        CreateMesh();
+        cd.position.x = transform.position.x;
+        cd.position.z = transform.position.z;
+        SetChunkNeighbours();
+        //CreateJSONFile();
 
-        }
-            yield break;
+        //}
+
     }
 
     private void GetcolourMap()
     {
         cd.meshColor = new Color[(cd.size + 1) * (cd.size + 1)];
         int colourCount = 0;
-        Color assignedColour = new Color(Random.Range(0F, 1F), Random.Range(0, 1F), Random.Range(0, 1F));
+        Color assignedColour = new Color(UnityEngine.Random.Range(0F, 1F), UnityEngine.Random.Range(0, 1F), UnityEngine.Random.Range(0, 1F));
         for (int z = 0; z <= cd.size; ++z)
         {
             for (int x = 0; x <= cd.size; ++x)
@@ -51,7 +60,7 @@ public class Chunk : MonoBehaviour
                 ++colourCount;
             }
         }
-    }
+    } 
 
     private void CreateMesh()
     {
@@ -91,9 +100,11 @@ public class Chunk : MonoBehaviour
         mesh.triangles = cd.triangles;
         mesh.RecalculateNormals();
         collider.sharedMesh = mesh;
+        smi = new SerializableMeshInfo(mesh);
+        //smi.MeshDump(mesh, (int)cd.arrayPos.x, (int)cd.arrayPos.y);
     }
 
-    private void CreateMeshFromFile()
+    private IEnumerator CreateMeshFromFile()
     {
         collider = GetComponent<MeshCollider>();
         GetComponent<MeshFilter>().mesh = mesh = new Mesh();
@@ -104,6 +115,7 @@ public class Chunk : MonoBehaviour
         mesh.triangles = cd.triangles;
         mesh.RecalculateNormals();
         collider.sharedMesh = mesh;
+        yield return null;
     }
 
     void SetChunkPosition(int x, int z)

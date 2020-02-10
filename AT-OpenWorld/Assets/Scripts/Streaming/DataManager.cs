@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System;
 
 public static class DataManager
 {
@@ -20,7 +21,6 @@ public static class DataManager
         string json = JsonUtility.ToJson(cd);
         File.WriteAllText
             (Application.dataPath + "/StreamingAssets/ChunkData" + cd.arrayPos.x.ToString() + cd.arrayPos.y.ToString() + ".json", json);
-        //++chunkCount;
     }
 
     public static void SaveNoiseMapData(byte[] bytes)
