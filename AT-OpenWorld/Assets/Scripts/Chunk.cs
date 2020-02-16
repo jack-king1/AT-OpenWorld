@@ -100,7 +100,7 @@ public class Chunk : MonoBehaviour
         mesh.triangles = cd.triangles;
         mesh.RecalculateNormals();
         collider.sharedMesh = mesh;
-        smi = new SerializableMeshInfo(mesh);
+        //smi = new SerializableMeshInfo(mesh);
         //smi.MeshDump(mesh, (int)cd.arrayPos.x, (int)cd.arrayPos.y);
     }
 
