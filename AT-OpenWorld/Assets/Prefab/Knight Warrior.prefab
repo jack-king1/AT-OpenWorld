@@ -2101,5 +2101,5 @@ MonoBehaviour:
   speed: 80
   rotateSpeed: 99.84
   anim: {fileID: 0}
-  gravity: 7
+  gravity: 0
   jumpForce: 20

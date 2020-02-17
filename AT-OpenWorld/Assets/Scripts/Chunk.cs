@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
 public class Chunk : MonoBehaviour
@@ -9,18 +10,23 @@ public class Chunk : MonoBehaviour
     [SerializeField] MeshCollider collider;
     public Mesh mesh;
     [SerializeField]private int chunkID;
+    public ThreadQueuer tq;
 
-    public IEnumerator BuildChunk(int x, int z)
+    private void Start()
     {
+        tq = gameObject.GetComponent<ThreadQueuer>();
+    }
+
+    public void BuildChunk(int x, int z)
+    {
+        Debug.Log("@BuildChunk. Building Chunk: " + x.ToString() + z.ToString());
         cd = new ChunkData();
+        tq = gameObject.GetComponent<ThreadQueuer>();
         //Check to see if chunk already has json.
-        if (DataManager.FileExist(x,z))
+        if (DataManager.FileExist(x,z) )
         {
             gameObject.GetComponent<MeshRenderer>().material = ColourMapData.instance.mat;
-            Debug.Log("Loading From File: Chunk " + x + z);
-            cd = DataManager.LoadChunkData(x,z);
-            CreateMeshFromFile();
-            transform.position = cd.position;
+            LoadChunk(x,z);
         }
         else
         {
@@ -32,10 +38,9 @@ public class Chunk : MonoBehaviour
             cd.position.x = transform.position.x;
             cd.position.z = transform.position.z;
             SetChunkNeighbours();
-            CreateJSONFile();
-
+            CreateJSONFile(x,z);
+            ChunkManager.instance.AddChunkToList(gameObject);
         }
-            yield break;
     }
 
     private void GetcolourMap()
@@ -93,19 +98,6 @@ public class Chunk : MonoBehaviour
         collider.sharedMesh = mesh;
     }
 
-    private void CreateMeshFromFile()
-    {
-        collider = GetComponent<MeshCollider>();
-        GetComponent<MeshFilter>().mesh = mesh = new Mesh();
-        mesh.vertices = cd.vertices;
-        mesh.uv = cd.uv;
-        mesh.tangents = cd.tangents;
-        mesh.colors = cd.meshColor;
-        mesh.triangles = cd.triangles;
-        mesh.RecalculateNormals();
-        collider.sharedMesh = mesh;
-    }
-
     void SetChunkPosition(int x, int z)
     {
         cd.arrayPos = new Vector2(x, z);
@@ -115,13 +107,76 @@ public class Chunk : MonoBehaviour
 
     void UnloadChunk()
     {
-        DataManager.UnloadChunkData(this.cd);
-        Destroy(this.gameObject);
+        string path = DataManager.CreateFilepath((int)cd.arrayPos.x, (int)cd.arrayPos.y);
+        tq.StartThreadedFunction(() => { DataManager.SaveChunk(this.cd, path); });
+        //Destroy(this.gameObject);
     }
 
-    void CreateJSONFile()
+    void LoadChunk(int x, int z)
     {
-        DataManager.UnloadChunkData(this.cd);
+        if (DataManager.FileExist(x, z))
+        {
+            string path = DataManager.CreateFilepath(x,z);
+            Debug.Log("Starting Thread For Loading:" + x.ToString() + z.ToString());
+            tq.StartThreadedFunction(() => { LoadChunkData(path); });
+        }
+        else
+        {
+            Debug.Log("No Chunk With That File Name.");
+        }
+    }
+
+
+    public void LoadChunkData(string path)
+    {
+        Debug.Log("@LoadingChunkData");
+        ChunkData newChunk;
+        string json = File.ReadAllText(path);
+        newChunk = JsonUtility.FromJson<ChunkData>(json);
+        tq.QueueMainThreadFunction(() => AssignChunkData(newChunk));
+    }
+    public void SaveChunk(ChunkData cd, object FilePath)
+    {
+        Debug.Log("Saving ChunkData");
+        string json = JsonUtility.ToJson(cd);
+        File.WriteAllText(FilePath.ToString(), json);
+    }
+
+    void CreateJSONFile(int x, int z)
+    {
+        //DataManager.UnloadChunkData(this.cd);
+        string path = DataManager.CreateFilepath(x,z);
+        tq.StartThreadedFunction(() => { DataManager.SaveChunk(this.cd, path ); });
+    }
+
+    public void AssignChunkData(ChunkData _cd)
+    {
+        Debug.Log("@Assigning Chunk Data with position as: " + cd.position + "Array ID: " + cd.arrayPos);
+        cd = _cd;
+        Debug.Log(cd.position);
+        CreateMeshFromFile();
+    }
+
+    public void CreateMeshFromFile()
+    {
+        gameObject.transform.position = cd.position;
+        if (cd != null)
+        {
+            collider = GetComponent<MeshCollider>();
+            GetComponent<MeshFilter>().mesh = mesh = new Mesh();
+            mesh.vertices = cd.vertices;
+            mesh.uv = cd.uv;
+            mesh.tangents = cd.tangents;
+            mesh.colors = cd.meshColor;
+            mesh.triangles = cd.triangles;
+            mesh.RecalculateNormals();
+            collider.sharedMesh = mesh;
+        }
+        else
+        {
+            Debug.Log("Chunk Data is NULL");
+        }
+        ChunkManager.instance.AddChunkToList(gameObject);
     }
 
     public Bounds GetWorldSpaceBounds()

@@ -36,20 +36,23 @@ public class ChunkManager : MonoBehaviour
         //        GenerateChunk(x,z);
         //    }
         //}
+    }
 
+    public void StartGame()
+    {
         GenerateChunk(1, 1);
-
         activeChunk = activeChunks[0].GetComponent<Chunk>();
         newActiveChunk = true;
     }
 
     private void Update()
     {
+
         if(activeChunks.Count != 0 && PlayerManager.instance.Player != null)
         {
             if(activeChunk == null)
             {
-
+                activeChunk = activeChunks[0].GetComponent<Chunk>();
             }
             else
             {
@@ -59,7 +62,7 @@ public class ChunkManager : MonoBehaviour
                         (c.GetComponent<Chunk>().GetWorldSpaceBounds().size.x * 2))
                     {
                         activeChunks.Remove(c);
-                        Destroy(c);
+                        //Destroy(c);
                     }
                 }
 
@@ -80,28 +83,37 @@ public class ChunkManager : MonoBehaviour
         }
     }
 
+    public void AddChunkToList(GameObject chunk)
+    {
+        activeChunks.Add(chunk);
+    }
+
     public GameObject GenerateChunk(int x, int z)
     {
         //Check if chunk doesnt exist.
         GameObject newChunk = new GameObject("Chunk " + x.ToString() + z.ToString());
         newChunk.AddComponent<Chunk>();
-        StartCoroutine(newChunk.GetComponent<Chunk>().BuildChunk(x, z));
-        activeChunks.Add(newChunk);
+        newChunk.AddComponent<ThreadQueuer>();
+        newChunk.GetComponent<Chunk>().BuildChunk(x, z);
         return newChunk;
     }
 
     bool ChunkExists(int x, int z)
     {
-        for(int i =0; i < activeChunks.Count; ++i)
+        bool exists = false;
+
+        foreach(GameObject go in activeChunks)
         {
-            int xPos = (int)activeChunks[i].GetComponent<Chunk>().cd.arrayPos.x;
-            int zPos = (int)activeChunks[i].GetComponent<Chunk>().cd.arrayPos.y;
-            if ( xPos == x && zPos == z)
+            Vector2 tempArrayPos = new Vector2(x,z);
+            ChunkData test = go.GetComponent<Chunk>().cd;
+            Vector2 arrayPos2 = new Vector2(go.GetComponent<Chunk>().cd.arrayPos.x, go.GetComponent<Chunk>().cd.arrayPos.y);
+            if(arrayPos2 == tempArrayPos)
             {
-                return true;
+                exists = true;
             }
         }
-        return false;
+
+        return exists;
     }
 
     void AssignActiveChunk()
@@ -158,7 +170,7 @@ public class ChunkManager : MonoBehaviour
         {
             if(activeChunk.cd.chunkNeighbour[i].x != -1 || activeChunk.cd.chunkNeighbour[i].y != -1)
             {
-                if(ChunkExists((int)activeChunk.cd.arrayPos.x, (int)activeChunk.cd.arrayPos.y))
+                if(!ChunkExists((int)activeChunk.cd.chunkNeighbour[i].x, (int)activeChunk.cd.chunkNeighbour[i].y))
                 {
                     GenerateChunk((int)activeChunk.cd.chunkNeighbour[i].x, (int)activeChunk.cd.chunkNeighbour[i].y);
                 }

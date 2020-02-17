@@ -2,25 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System;
 
 public static class DataManager
 {
     static int chunkCount = 0;
-    public static ChunkData LoadChunkData(int x, int z)
+    public static void LoadChunkData(Chunk chunk, string path)
     {
         ChunkData newChunk;
-        string json = File.ReadAllText
-            (Application.dataPath + "/StreamingAssets/ChunkData" + x.ToString() + z.ToString() + ".json");
+        string json = File.ReadAllText(path);
         newChunk = JsonUtility.FromJson<ChunkData>(json);
-        return newChunk;
-    }
 
-    public static void UnloadChunkData(ChunkData cd)
+    }
+    public static void SaveChunk(ChunkData cd, object FilePath)
     {
+        Debug.Log("Saving ChunkData");
         string json = JsonUtility.ToJson(cd);
-        File.WriteAllText
-            (Application.dataPath + "/StreamingAssets/ChunkData" + cd.arrayPos.x.ToString() + cd.arrayPos.y.ToString() + ".json", json);
-        //++chunkCount;
+        File.WriteAllText(FilePath.ToString(), json);
     }
 
     public static void SaveNoiseMapData(byte[] bytes)
@@ -51,5 +49,10 @@ public static class DataManager
         string filePath = (Application.dataPath + "/StreamingAssets/ChunkData" + x.ToString() + z.ToString() + ".json");
         bool exists = File.Exists(filePath);
         return exists;
+    }
+
+    public static string CreateFilepath(int x, int z)
+    {
+        return (Application.dataPath + "/StreamingAssets/ChunkData" + x.ToString() + z.ToString() + ".json");
     }
 }
