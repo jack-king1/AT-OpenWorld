@@ -6,7 +6,6 @@ using System;
 
 public static class DataManager
 {
-    static int chunkCount = 0;
     public static void LoadChunkData(Chunk chunk, string path)
     {
         ChunkData newChunk;

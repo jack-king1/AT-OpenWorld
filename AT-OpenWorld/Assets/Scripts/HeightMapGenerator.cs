@@ -5,8 +5,7 @@ using System.IO;
 
 public class HeightMapGenerator : MonoBehaviour
 {
-    private static float ChunkWidth = 256f;
-    private static float ChunkHeight = 256f;
+    private static float chunkSize;
     public int xSize, zSize, octaves;
     public float scale, persistance, lucanarity, meshHeightMultiplier;
     public static Texture2D HeightMap;
@@ -14,6 +13,8 @@ public class HeightMapGenerator : MonoBehaviour
 
     void Start()
     {
+        chunkSize = ChunkManager.instance.chunkSize;
+
         byte[] heightMapData;
         if(File.Exists(Application.dataPath + "/StreamingAssets/NoiseMap.png"))
         {
@@ -21,14 +22,15 @@ public class HeightMapGenerator : MonoBehaviour
         }
         else
         {
-            Noise.GenerateNoiseTest(ChunkWidth * Mathf.Sqrt((float)ChunkManager.instance.mapChunkTotal), ChunkHeight * Mathf.Sqrt((float)ChunkManager.instance.mapChunkTotal),
+            Noise.GenerateNoiseTest(chunkSize * Mathf.Sqrt((float)ChunkManager.instance.mapChunkTotal), 
+                chunkSize * Mathf.Sqrt((float)ChunkManager.instance.mapChunkTotal),
             scale, octaves, persistance, lucanarity);
             SetTexture();
         }
 
         void SetTexture()
         {
-            HeightMap = new Texture2D((int)ChunkWidth, (int)ChunkHeight, TextureFormat.ARGB32, true);
+            HeightMap = new Texture2D((int)chunkSize, (int)chunkSize, TextureFormat.ARGB32, true);
             heightMapData = File.ReadAllBytes(Application.dataPath + "/StreamingAssets/NoiseMap.png");
             HeightMap.LoadImage(heightMapData);
             HeightMapPreview = HeightMap;
@@ -42,7 +44,7 @@ public class HeightMapGenerator : MonoBehaviour
 
     public static float[] GetChunkDimensions()
     {
-        float[] dimensions = { ChunkWidth, ChunkHeight };
+        float[] dimensions = { chunkSize, chunkSize };
         return dimensions;
     }
 }

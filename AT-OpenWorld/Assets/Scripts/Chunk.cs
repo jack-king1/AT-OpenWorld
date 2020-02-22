@@ -31,7 +31,7 @@ public class Chunk : MonoBehaviour
         else
         {
             gameObject.GetComponent<MeshRenderer>().material = ColourMapData.instance.mat;
-            cd.size = 128;
+            cd.size = (int)ChunkManager.instance.chunkSize;
             SetChunkPosition(x,z);
             GetcolourMap();
             CreateMesh();
@@ -70,9 +70,9 @@ public class Chunk : MonoBehaviour
 
         for (int i = 0, z = 0; z <= cd.size; z++)
         {
-            for (int x = 0; x <= cd.size; x++, i++)
+            for (int x = 0; x <= cd.size ; x++, i++)
             {
-                cd.vertices[i] = new Vector3(x, 0, z);
+                cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing, 0, z*ChunkManager.instance.verticySpaceing);
                 cd.uv[i] = new Vector2((float)x / cd.size, (float)z / cd.size);
                 cd.tangents[i] = cd.tangent;
             }
@@ -102,17 +102,23 @@ public class Chunk : MonoBehaviour
     {
         cd.arrayPos = new Vector2(x, z);
 
-        gameObject.transform.position = new Vector3(x * cd.size, 0, z * cd.size);
+        gameObject.transform.position = new Vector3((x * (cd.size * ChunkManager.instance.verticySpaceing)), 0, 
+            z * (cd.size * ChunkManager.instance.verticySpaceing));
     }
 
-    void UnloadChunk()
+    public void UnloadChunk()
     {
         string path = DataManager.CreateFilepath((int)cd.arrayPos.x, (int)cd.arrayPos.y);
-        tq.StartThreadedFunction(() => { DataManager.SaveChunk(this.cd, path); });
+        tq.StartThreadedFunction(() => { SaveChunkData(this.cd, path); });
         //Destroy(this.gameObject);
     }
 
-    void LoadChunk(int x, int z)
+    void DestroyChunk()
+    {
+        Destroy(this.gameObject);
+    }
+
+    public void LoadChunk(int x, int z)
     {
         if (DataManager.FileExist(x, z))
         {
@@ -126,7 +132,6 @@ public class Chunk : MonoBehaviour
         }
     }
 
-
     public void LoadChunkData(string path)
     {
         Debug.Log("@LoadingChunkData");
@@ -135,11 +140,12 @@ public class Chunk : MonoBehaviour
         newChunk = JsonUtility.FromJson<ChunkData>(json);
         tq.QueueMainThreadFunction(() => AssignChunkData(newChunk));
     }
-    public void SaveChunk(ChunkData cd, object FilePath)
+    public void SaveChunkData(ChunkData cd, object FilePath)
     {
-        Debug.Log("Saving ChunkData");
+        Debug.Log("@SavingChunkData");
         string json = JsonUtility.ToJson(cd);
         File.WriteAllText(FilePath.ToString(), json);
+        tq.QueueMainThreadFunction(() => DestroyChunk());
     }
 
     void CreateJSONFile(int x, int z)

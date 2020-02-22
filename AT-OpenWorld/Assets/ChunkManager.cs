@@ -13,6 +13,9 @@ public class ChunkManager : MonoBehaviour
     private bool newActiveChunk = true;
     public Chunk activeChunk;
 
+    public float verticySpaceing;
+    public float chunkSize;
+
 
     private void Awake()
     {
@@ -40,14 +43,13 @@ public class ChunkManager : MonoBehaviour
 
     public void StartGame()
     {
-        GenerateChunk(1, 1);
+        GenerateChunk(3, 2);
         activeChunk = activeChunks[0].GetComponent<Chunk>();
         newActiveChunk = true;
     }
 
     private void Update()
     {
-
         if(activeChunks.Count != 0 && PlayerManager.instance.Player != null)
         {
             if(activeChunk == null)
@@ -56,13 +58,13 @@ public class ChunkManager : MonoBehaviour
             }
             else
             {
-                foreach(GameObject c in activeChunks)
+                foreach(GameObject c in activeChunks.ToArray())
                 {
                     if(Vector3.Distance(c.gameObject.transform.position, PlayerManager.instance.GetPlayer().transform.position) > 
-                        (c.GetComponent<Chunk>().GetWorldSpaceBounds().size.x * 2))
+                        (c.GetComponent<Chunk>().GetWorldSpaceBounds().size.x * 3))
                     {
                         activeChunks.Remove(c);
-                        //Destroy(c);
+                        c.GetComponent<Chunk>().UnloadChunk();
                     }
                 }
 
@@ -101,8 +103,7 @@ public class ChunkManager : MonoBehaviour
     bool ChunkExists(int x, int z)
     {
         bool exists = false;
-
-        foreach(GameObject go in activeChunks)
+        foreach(GameObject go in activeChunks.ToArray())
         {
             Vector2 tempArrayPos = new Vector2(x,z);
             ChunkData test = go.GetComponent<Chunk>().cd;
@@ -112,13 +113,12 @@ public class ChunkManager : MonoBehaviour
                 exists = true;
             }
         }
-
         return exists;
     }
 
     void AssignActiveChunk()
     {
-        foreach (GameObject c in activeChunks)
+        foreach (GameObject c in activeChunks.ToArray())
         {
             if (c.GetComponent<Chunk>().GetWorldSpaceBounds().Contains(PlayerManager.instance.GetPlayer().transform.position))
             {
@@ -131,7 +131,7 @@ public class ChunkManager : MonoBehaviour
 
     void FindActiveChunk()
     {
-        foreach(GameObject c in activeChunks)
+        foreach(GameObject c in activeChunks.ToArray())
         {
             Vector3 playerPos = PlayerManager.instance.GetPlayer().gameObject.transform.position;
             Vector3 chunkPos = c.GetComponent<Chunk>().gameObject.transform.position;
