@@ -49,6 +49,8 @@ MonoBehaviour:
   startChunk: 0
   playerActiveChunk: 0
   activeChunk: {fileID: 0}
+  verticySpaceing: 64
+  chunkSize: 8
 --- !u!1 &7438663532719009431
 GameObject:
   m_ObjectHideFlags: 0
@@ -217,12 +219,22 @@ PrefabInstance:
     - target: {fileID: 7833331950858316758, guid: 95573460eec672b42b2b6f751261a158,
         type: 3}
       propertyPath: scale
-      value: 300
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 7833331950858316758, guid: 95573460eec672b42b2b6f751261a158,
+        type: 3}
+      propertyPath: persistance
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7833331950858316758, guid: 95573460eec672b42b2b6f751261a158,
+        type: 3}
+      propertyPath: lucanarity
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7833331950858316758, guid: 95573460eec672b42b2b6f751261a158,
         type: 3}
       propertyPath: meshHeightMultiplier
-      value: 150
+      value: 60
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 95573460eec672b42b2b6f751261a158, type: 3}

@@ -11,7 +11,7 @@ public class Chunk : MonoBehaviour
     public Mesh mesh;
     [SerializeField]private int chunkID;
     public ThreadQueuer tq;
-
+    float[,] localNoiseMap;
     private void Start()
     {
         tq = gameObject.GetComponent<ThreadQueuer>();
@@ -33,7 +33,9 @@ public class Chunk : MonoBehaviour
             gameObject.GetComponent<MeshRenderer>().material = ColourMapData.instance.mat;
             cd.size = (int)ChunkManager.instance.chunkSize;
             SetChunkPosition(x,z);
-            GetcolourMap();
+            GetLocalHeightMap();
+            GetLocalColourMap();
+            //GetcolourMap();
             CreateMesh();
             cd.position.x = transform.position.x;
             cd.position.z = transform.position.z;
@@ -45,6 +47,7 @@ public class Chunk : MonoBehaviour
 
     private void GetcolourMap()
     {
+        //assign a random colouir //old colour map.
         cd.meshColor = new Color[(cd.size + 1) * (cd.size + 1)];
         int colourCount = 0;
         Color assignedColour = new Color(Random.Range(0F, 1F), Random.Range(0, 1F), Random.Range(0, 1F));
@@ -56,6 +59,48 @@ public class Chunk : MonoBehaviour
                 ++colourCount;
             }
         }
+    }
+
+
+    private void GetLocalColourMap()
+    {
+        cd.meshColor = new Color[(cd.size + 1) * (cd.size + 1)];
+        int colourCount = 0;
+        for (int z = 0; z <= cd.size; ++z)
+        {
+            for (int x = 0; x <= cd.size; ++x)
+            {
+                float currentHeight = localNoiseMap[x, z];
+                for (int i = 0; i < ColourMapData.instance.regions.Length; ++i)
+                {
+                    if (currentHeight <= ColourMapData.instance.regions[i].height)
+                    {
+                        cd.meshColor[colourCount] = ColourMapData.instance.regions[i].colour;
+                    }
+                }
+                ++colourCount;
+            }
+        }
+        bool fam = false;
+    }
+
+    private void GetLocalHeightMap()
+    {
+        //Get height map from texture2D created from png in Noise.cs.
+        Texture2D nm = HeightMapGenerator.GetHeightMap();
+        localNoiseMap = new float[cd.size + 1, cd.size + 1];
+        // Debug.Log("NoiseMap Size: " + noiseMap.Length);
+        for (int x = 0; x < cd.size; ++x)
+        {
+            for (int z = 0; z < cd.size; ++z)
+            {
+                int xPos = x + ((int)cd.arrayPos.x * cd.size);
+                int zPos = z + ((int)cd.arrayPos.y * cd.size);
+                localNoiseMap[x, z] = nm.GetPixel(xPos, zPos).grayscale;
+            }
+        }
+
+        bool fam = false;
     }
 
     private void CreateMesh()
@@ -72,7 +117,17 @@ public class Chunk : MonoBehaviour
         {
             for (int x = 0; x <= cd.size ; x++, i++)
             {
-                cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing, 0, z*ChunkManager.instance.verticySpaceing);
+                //cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing,
+                //    HeightMapGenerator.instance.ac.Evaluate(localNoiseMap[x, z]) * HeightMapGenerator.instance.meshHeightMultiplier,
+                //    z * ChunkManager.instance.verticySpaceing);
+
+                cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing,localNoiseMap[x, z] * HeightMapGenerator.instance.meshHeightMultiplier,z * ChunkManager.instance.verticySpaceing);
+
+                //cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing,
+                //    0,
+                //     z * ChunkManager.instance.verticySpaceing);
+
+
                 cd.uv[i] = new Vector2((float)x / cd.size, (float)z / cd.size);
                 cd.tangents[i] = cd.tangent;
             }
