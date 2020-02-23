@@ -401,7 +401,7 @@ PrefabInstance:
     - target: {fileID: 7438663532142831186, guid: d09867fe18ee629419e155221d2a1261,
         type: 3}
       propertyPath: scale
-      value: 200000
+      value: 20000
       objectReference: {fileID: 0}
     - target: {fileID: 7438663532142831186, guid: d09867fe18ee629419e155221d2a1261,
         type: 3}
@@ -446,7 +446,7 @@ PrefabInstance:
     - target: {fileID: 7438663532142831186, guid: d09867fe18ee629419e155221d2a1261,
         type: 3}
       propertyPath: meshHeightMultiplier
-      value: 100
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 7438663532142831186, guid: d09867fe18ee629419e155221d2a1261,
         type: 3}

@@ -90,9 +90,9 @@ public class Chunk : MonoBehaviour
         Texture2D nm = HeightMapGenerator.GetHeightMap();
         localNoiseMap = new float[cd.size + 1, cd.size + 1];
         // Debug.Log("NoiseMap Size: " + noiseMap.Length);
-        for (int x = 0; x < cd.size; ++x)
+        for (int x = 0; x <= cd.size; ++x)
         {
-            for (int z = 0; z < cd.size; ++z)
+            for (int z = 0; z <= cd.size; ++z)
             {
                 int xPos = x + ((int)cd.arrayPos.x * cd.size);
                 int zPos = z + ((int)cd.arrayPos.y * cd.size);
@@ -117,11 +117,11 @@ public class Chunk : MonoBehaviour
         {
             for (int x = 0; x <= cd.size ; x++, i++)
             {
-                //cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing,
-                //    HeightMapGenerator.instance.ac.Evaluate(localNoiseMap[x, z]) * HeightMapGenerator.instance.meshHeightMultiplier,
-                //    z * ChunkManager.instance.verticySpaceing);
+                float evHeight = HeightMapGenerator.instance.ac.Evaluate(localNoiseMap[x, z]);
+                cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing,
+                    (evHeight * HeightMapGenerator.instance.meshHeightMultiplier),
+                    z * ChunkManager.instance.verticySpaceing);
 
-                cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing,localNoiseMap[x, z] * HeightMapGenerator.instance.meshHeightMultiplier,z * ChunkManager.instance.verticySpaceing);
 
                 //cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing,
                 //    0,
