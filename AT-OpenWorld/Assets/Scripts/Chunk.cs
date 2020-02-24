@@ -163,9 +163,8 @@ public class Chunk : MonoBehaviour
 
     public void UnloadChunk()
     {
-        string path = DataManager.CreateFilepath((int)cd.arrayPos.x, (int)cd.arrayPos.y);
+        string path = DataManager.CreateChunkFilepath((int)cd.arrayPos.x, (int)cd.arrayPos.y);
         tq.StartThreadedFunction(() => { SaveChunkData(this.cd, path); });
-        //Destroy(this.gameObject);
     }
 
     void DestroyChunk()
@@ -177,7 +176,7 @@ public class Chunk : MonoBehaviour
     {
         if (DataManager.FileExist(x, z))
         {
-            string path = DataManager.CreateFilepath(x,z);
+            string path = DataManager.CreateChunkFilepath(x,z);
             Debug.Log("Starting Thread For Loading:" + x.ToString() + z.ToString());
             tq.StartThreadedFunction(() => { LoadChunkData(path); });
         }
@@ -206,7 +205,8 @@ public class Chunk : MonoBehaviour
     void CreateJSONFile(int x, int z)
     {
         //DataManager.UnloadChunkData(this.cd);
-        string path = DataManager.CreateFilepath(x,z);
+        string path = DataManager.CreateChunkFilepath(x,z);
+        DataManager.CreateDirectory(x,z);
         tq.StartThreadedFunction(() => { DataManager.SaveChunk(this.cd, path ); });
     }
 

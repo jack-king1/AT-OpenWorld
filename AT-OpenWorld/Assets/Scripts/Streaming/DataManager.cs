@@ -30,28 +30,38 @@ public static class DataManager
         File.WriteAllBytes(Application.dataPath + "/StreamingAssets/" + fileName + ".png", bytes);
     }
 
-    public static void SaveAnimationCurve(AnimationCurve ac)
-    {
-        string json = JsonUtility.ToJson(ac);
-        File.WriteAllText(Application.dataPath + "/StreamingAssets/AnimationCurve.json", json);
-    }
-
-    public static Material GetVertexShader()
-    {
-        //Shader shdr = Resources.Load("/Resources/VertexColors.shader", typeof (Shader)) as Shader;
-        Material ac = Resources.Load<Material>(Application.dataPath + "Resources/Materials/VertexMat.mat");
-        return ac;
-    }
-
     public static bool FileExist(int x, int z)
     {
-        string filePath = (Application.dataPath + "/StreamingAssets/ChunkData" + x.ToString() + z.ToString() + ".json");
+        string filePath = (Application.dataPath + "/StreamingAssets/" + x.ToString() + z.ToString() + "ChunkData" + x.ToString() + z.ToString() + ".json");
         bool exists = File.Exists(filePath);
         return exists;
     }
 
-    public static string CreateFilepath(int x, int z)
+    public static bool ObjectFileExist(int x, int z, string name)
     {
-        return (Application.dataPath + "/StreamingAssets/ChunkData" + x.ToString() + z.ToString() + ".json");
+        string filePath = (Application.dataPath + "/StreamingAssets/" + x.ToString() + z.ToString() + "ChunkData" + x.ToString() + z.ToString() + ".json");
+        bool exists = File.Exists(filePath);
+        return exists;
+    }
+
+    public static string CreateChunkFilepath(int x, int z)
+    {
+        return (Application.dataPath + "/StreamingAssets/" + x.ToString() + z.ToString() + "/ChunkData" + x.ToString() + z.ToString() + ".json");
+    }
+
+    public static string CreateWorldObjectFilepath(int x, int z, string objectName)
+    {
+        return (Application.dataPath + "/StreamingAssets/" + x.ToString() + z.ToString() + "/WorldObjects/" + x.ToString() + z.ToString() + ".json");
+    }
+
+    public static void CreateDirectory(int x, int z)
+    {
+        string filePath = (Application.dataPath + "/StreamingAssets/" + x.ToString() + z.ToString());
+        Directory.CreateDirectory(filePath);
+    }
+
+    public static void UnloadWorldObject()
+    {
+
     }
 }
