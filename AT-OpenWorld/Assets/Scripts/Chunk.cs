@@ -12,9 +12,14 @@ public class Chunk : MonoBehaviour
     [SerializeField]private int chunkID;
     public ThreadQueuer tq;
     float[,] localNoiseMap;
+
+    //Pathfinding
+    public GameObject GridObject;
+
     private void Start()
     {
         tq = gameObject.GetComponent<ThreadQueuer>();
+        CreateGrid();
     }
 
     public void BuildChunk(int x, int z)
@@ -117,14 +122,14 @@ public class Chunk : MonoBehaviour
         {
             for (int x = 0; x <= cd.size ; x++, i++)
             {
-                //float evHeight = HeightMapGenerator.instance.ac.Evaluate(localNoiseMap[x, z]);
-                //cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing,
-                //    (evHeight * HeightMapGenerator.instance.meshHeightMultiplier),
-                //    z * ChunkManager.instance.verticySpaceing);
-
+                float evHeight = HeightMapGenerator.instance.ac.Evaluate(localNoiseMap[x, z]);
                 cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing,
-                    0,
+                    (evHeight * HeightMapGenerator.instance.meshHeightMultiplier),
                     z * ChunkManager.instance.verticySpaceing);
+
+                //cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing,
+                //    0,
+                //    z * ChunkManager.instance.verticySpaceing);
 
 
                 //cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing,
@@ -327,5 +332,14 @@ public class Chunk : MonoBehaviour
         {
             cd.chunkNeighbour[(int)directions.NW] = new Vector2(-1, -1);
         }
+    }
+
+    void CreateGrid()
+    {
+        GridObject = new GameObject("Pathfinding Grid");
+        GridObject.transform.position = gameObject.GetComponent<Renderer>().bounds.center;
+        GridObject.transform.SetParent(gameObject.transform);
+        GridObject.AddComponent<Grid>();
+        GridObject.GetComponent<Grid>().Init(ChunkManager.instance.verticySpaceing * ChunkManager.instance.chunkSize, 64);
     }
 }

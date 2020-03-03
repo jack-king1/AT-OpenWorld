@@ -43,7 +43,7 @@ public class ChunkManager : MonoBehaviour
 
     public void StartGame()
     {
-        GenerateChunk(8, 8);
+        GenerateChunk(0, 0);
         activeChunk = activeChunks[0].GetComponent<Chunk>();
         newActiveChunk = true;
     }
