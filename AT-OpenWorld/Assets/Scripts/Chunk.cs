@@ -117,9 +117,13 @@ public class Chunk : MonoBehaviour
         {
             for (int x = 0; x <= cd.size ; x++, i++)
             {
-                float evHeight = HeightMapGenerator.instance.ac.Evaluate(localNoiseMap[x, z]);
+                //float evHeight = HeightMapGenerator.instance.ac.Evaluate(localNoiseMap[x, z]);
+                //cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing,
+                //    (evHeight * HeightMapGenerator.instance.meshHeightMultiplier),
+                //    z * ChunkManager.instance.verticySpaceing);
+
                 cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing,
-                    (evHeight * HeightMapGenerator.instance.meshHeightMultiplier),
+                    0,
                     z * ChunkManager.instance.verticySpaceing);
 
 
