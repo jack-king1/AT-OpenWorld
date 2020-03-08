@@ -19,7 +19,7 @@ public class StartGame : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.M))
         {
-            ChunkManager.instance.StartGame();
+            ChunkManager.instance.StartGame(x,y);
         }
 
         if (Input.GetKeyDown(KeyCode.P))

@@ -15,6 +15,7 @@ public class ChunkManager : MonoBehaviour
 
     public float verticySpaceing;
     public float chunkSize;
+    public float rowSize;
 
 
     private void Awake()
@@ -31,7 +32,7 @@ public class ChunkManager : MonoBehaviour
 
     void Start()
     {
-        int size = (int)Mathf.Sqrt(mapChunkTotal);
+        rowSize = (int)Mathf.Sqrt(mapChunkTotal);
         //for(int x = 0; x < size; ++x)
         //{
         //    for (int z = 0; z < size; ++z)
@@ -41,9 +42,9 @@ public class ChunkManager : MonoBehaviour
         //}
     }
 
-    public void StartGame()
+    public void StartGame(int x, int y)
     {
-        GenerateChunk(0, 0);
+        GenerateChunk(x, y);
         activeChunk = activeChunks[0].GetComponent<Chunk>();
         newActiveChunk = true;
     }

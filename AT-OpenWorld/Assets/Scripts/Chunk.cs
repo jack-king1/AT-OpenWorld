@@ -66,7 +66,6 @@ public class Chunk : MonoBehaviour
         }
     }
 
-
     private void GetLocalColourMap()
     {
         cd.meshColor = new Color[(cd.size + 1) * (cd.size + 1)];
@@ -123,9 +122,9 @@ public class Chunk : MonoBehaviour
             for (int x = 0; x <= cd.size ; x++, i++)
             {
                 float evHeight = HeightMapGenerator.instance.ac.Evaluate(localNoiseMap[x, z]);
-                cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing,
+                cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing - (cd.size * ChunkManager.instance.verticySpaceing / 2),
                     (evHeight * HeightMapGenerator.instance.meshHeightMultiplier),
-                    z * ChunkManager.instance.verticySpaceing);
+                    (z * ChunkManager.instance.verticySpaceing) - (cd.size * ChunkManager.instance.verticySpaceing / 2));
 
                 //cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing,
                 //    0,
@@ -336,10 +335,22 @@ public class Chunk : MonoBehaviour
 
     void CreateGrid()
     {
-        GridObject = new GameObject("Pathfinding Grid");
-        GridObject.transform.position = gameObject.GetComponent<Renderer>().bounds.center;
+
+        GridObject = new GameObject("Pathfinding"); //This is to set the localtransform to 0,0,0 for the pathfinding.
         GridObject.transform.SetParent(gameObject.transform);
+        GridObject.transform.SetParent(transform);
+        GridObject.transform.position = gameObject.GetComponent<Renderer>().bounds.center;
+        TempUnits();
         GridObject.AddComponent<Grid>();
-        GridObject.GetComponent<Grid>().Init(ChunkManager.instance.verticySpaceing * ChunkManager.instance.chunkSize, 64);
+        GridObject.GetComponent<Grid>().Init(ChunkManager.instance.verticySpaceing * ChunkManager.instance.chunkSize, 256);
+        GridObject.AddComponent<Pathfinding>();
+    }
+
+    void TempUnits()
+    {
+       GameObject seeker = Instantiate(Resources.Load("Prefabs/Seeker"), GridObject.transform, false) as GameObject;
+       GameObject target = Instantiate(Resources.Load("Prefabs/Target"), GridObject.transform, false) as GameObject;
+
+       target.transform.localPosition = new Vector3(-800, 1, -800);
     }
 }

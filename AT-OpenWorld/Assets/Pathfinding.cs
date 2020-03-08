@@ -11,11 +11,16 @@ public class Pathfinding : MonoBehaviour
     private void Awake()
     {
         grid = GetComponent<Grid>();
+        seeker = GameObject.FindGameObjectWithTag("Seeker").transform;
+        target = GameObject.FindGameObjectWithTag("Target").transform;
     }
 
     private void Update()
     {
-        FindPath(seeker.position, target.position);
+        if(seeker!= null && target != null)
+        {
+            FindPath(seeker.localPosition, target.localPosition);
+        }
     }
 
     void FindPath(Vector3 startPos, Vector3 targetPos)
@@ -75,15 +80,12 @@ public class Pathfinding : MonoBehaviour
     {
         List<Node> path = new List<Node>();
         Node currentNode = endNode;
-
         while (currentNode != startNode)
         {
             currentNode = currentNode.parent;
         }
         path.Reverse();
-
         grid.path = path;
-
     }
 
     int GetDistance(Node a, Node b)
