@@ -11,8 +11,8 @@ public class Pathfinding : MonoBehaviour
     private void Awake()
     {
         grid = GetComponent<Grid>();
-        seeker = GameObject.FindGameObjectWithTag("Seeker").transform;
-        target = GameObject.FindGameObjectWithTag("Target").transform;
+        //seeker = GameObject.FindGameObjectWithTag("Seeker").transform;
+        //target = GameObject.FindGameObjectWithTag("Target").transform;
     }
 
     private void Update()

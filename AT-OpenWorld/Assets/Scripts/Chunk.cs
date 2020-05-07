@@ -341,21 +341,21 @@ public class Chunk : MonoBehaviour
         GridObject.transform.SetParent(gameObject.transform);
         GridObject.transform.SetParent(transform);
         GridObject.transform.position = gameObject.GetComponent<Renderer>().bounds.center;
-        TempUnits();
+        //TempUnits();
         GridObject.AddComponent<Grid>();
         GridObject.GetComponent<Grid>().Init(ChunkManager.instance.verticySpaceing * ChunkManager.instance.chunkSize, 32);
         GridObject.AddComponent<Pathfinding>();
     }
 
-    void TempUnits()
-    {
-       GameObject seeker = Instantiate(Resources.Load("Prefabs/Seeker"), GridObject.transform, false) as GameObject;
-       GameObject target = Instantiate(Resources.Load("Prefabs/Target"), GridObject.transform, false) as GameObject;
+    //void TempUnits()
+    //{
+    //   GameObject seeker = Instantiate(Resources.Load("Prefabs/Seeker"), GridObject.transform, false) as GameObject;
+    //   GameObject target = Instantiate(Resources.Load("Prefabs/Target"), GridObject.transform, false) as GameObject;
 
-       target.transform.localPosition = new Vector3(-800, 1, -800);
-       seeker.transform.localPosition = new Vector3(800, 1, 800);
+    //   target.transform.localPosition = new Vector3(-800, 1, -800);
+    //   seeker.transform.localPosition = new Vector3(800, 1, 800);
 
-       GameObject cube = Instantiate(Resources.Load("Prefabs/Cube"), GridObject.transform, false) as GameObject;
-        cube.transform.localPosition = new Vector3(-1100, 1, -1100);
-    }
+    //   GameObject cube = Instantiate(Resources.Load("Prefabs/Cube"), GridObject.transform, false) as GameObject;
+    //    cube.transform.localPosition = new Vector3(-1100, 1, -1100);
+    //}
 }
