@@ -8,7 +8,7 @@ public class movement : MonoBehaviour
     [SerializeField] private float speed = 10;
     [SerializeField] private float rotateSpeed = 50;
     [SerializeField] private Animator anim;
-    [SerializeField] private float gravity = 7.0f;
+    [SerializeField] private float gravity = 0f;
     [SerializeField] private float jumpForce = 2.0f;
 
     CharacterController controller;
@@ -26,7 +26,7 @@ public class movement : MonoBehaviour
     {
         if(!controller.isGrounded)
         {
-            move.y -= gravity * Time.deltaTime;
+            //move.y -= gravity * Time.deltaTime;
         }
     }
 

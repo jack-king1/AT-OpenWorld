@@ -11,7 +11,11 @@ public class ChunkManager : MonoBehaviour
     public int startChunk;
     [SerializeField] private int playerActiveChunk;
     private bool newActiveChunk = true;
-    private Chunk activeChunk;
+    public Chunk activeChunk;
+
+    public float verticySpaceing;
+    public float chunkSize;
+    public float rowSize;
 
 
     private void Awake()
@@ -24,94 +28,154 @@ public class ChunkManager : MonoBehaviour
         startChunk = mapChunkTotal / 4;
         playerActiveChunk = startChunk;
         newActiveChunk = true;
-        //activeChunk = activeChunks[0].GetComponent<Chunk>();
+    }
+
+    void Start()
+    {
+        rowSize = (int)Mathf.Sqrt(mapChunkTotal);
+        //for(int x = 0; x < size; ++x)
+        //{
+        //    for (int z = 0; z < size; ++z)
+        //    {
+        //        GenerateChunk(x,z);
+        //    }
+        //}
+    }
+
+    public void StartGame(int x, int y)
+    {
+        GenerateChunk(x, y);
+        activeChunk = activeChunks[0].GetComponent<Chunk>();
+        newActiveChunk = true;
     }
 
     private void Update()
     {
-        if(activeChunks.Count != 0)
+        if(activeChunks.Count != 0 && PlayerManager.instance.Player != null)
         {
-
-            foreach (GameObject chunk in activeChunks)
+            if(activeChunk == null)
             {
-                //Check to see if chunk is within distance of player to be rendered if npot delete it/unload it
-                Chunk chunkObject = chunk.GetComponent<Chunk>();
-                if (Vector3.Distance(PlayerManager.instance.GetPlayer().gameObject.transform.position,
-                    chunkObject.GetWorldSpaceBounds().center) > 560 )
+                activeChunk = activeChunks[0].GetComponent<Chunk>();
+            }
+            else
+            {
+                foreach(GameObject c in activeChunks.ToArray())
                 {
-                    Debug.Log("Deleting Chunk");
-                    //Call chunk unload here
-                    activeChunks.Remove(chunk);
-                    Destroy(chunk);
-                }
-
-                //Check to see if player is in new chunk.
-                if(chunkObject.GetWorldSpaceBounds().Contains(PlayerManager.instance.GetPlayer().gameObject.transform.position))
-                {
-                    playerActiveChunk = chunk.GetComponent<Chunk>().cd.chunkID;
-                    newActiveChunk = true;
-                    for(int i = 0; i < activeChunks.Count; ++i)
+                    if(Vector3.Distance(c.gameObject.transform.position, PlayerManager.instance.GetPlayer().transform.position) > 
+                        (c.GetComponent<Chunk>().GetWorldSpaceBounds().size.x * 3))
                     {
-                        if(activeChunks[i].GetComponent<Chunk>().cd.chunkID == playerActiveChunk)
-                        {
-                            activeChunk = activeChunks[i].GetComponent<Chunk>();
-                        }
+                        activeChunks.Remove(c);
+                        c.GetComponent<Chunk>().UnloadChunk();
                     }
                 }
 
-                //if player is in a new chunk generate its correct neighbours.
+                //Checks if player has left activechunk.
+                if (!PlayerInside())
+                {
+                    Debug.Log("Player Left active chunk");
+                    FindActiveChunk();
+                }
+
                 if(newActiveChunk)
                 {
-                    if(activeChunk == null)
-                    {
-                        activeChunk = activeChunks[0].GetComponent<Chunk>();
-                    }
-                    //Check if neighbour already exists.
-                    int activeChunkCount = activeChunks.Count;
-                    for(int n = 0; n < activeChunk.cd.chunkNeighbour.Length; ++n)
-                    {
-                        if(chunkExists(activeChunk.cd.chunkNeighbour[n]) && activeChunk.cd.chunkNeighbour[n] != -1)
-                        {
-                            GenerateChunk(activeChunk.cd.chunkNeighbour[n]);
-                        }
-                    }
-                    newActiveChunk = false;
+                    //loadNeighbours
+                    LoadNeighbours();
+                    newActiveChunk = false; 
                 }
             }
         }
     }
 
-    public void GenerateChunks(float chunkWidth, float chunkHeight)
+    public void AddChunkToList(GameObject chunk)
     {
-        int totalChunks = (int)chunkWidth * (int)chunkHeight;
-
-        for (int i = 0; i < mapChunkTotal; ++i)
-        {
-            GameObject newChunk = new GameObject("Chunk " + i.ToString());
-            newChunk.AddComponent<Chunk>();
-            ++chunkCount;
-        }
+        activeChunks.Add(chunk);
     }
 
-    public GameObject GenerateChunk(int chunkID)
+    public GameObject GenerateChunk(int x, int z)
     {
         //Check if chunk doesnt exist.
-        GameObject newChunk = new GameObject("Chunk " + chunkID.ToString());
+        GameObject newChunk = new GameObject("Chunk " + x.ToString() + z.ToString());
         newChunk.AddComponent<Chunk>();
-        StartCoroutine(newChunk.GetComponent<Chunk>().BuildChunk(chunkID));
-        activeChunks.Add(newChunk);
+        newChunk.AddComponent<ThreadQueuer>();
+        newChunk.GetComponent<Chunk>().BuildChunk(x, z);
         return newChunk;
     }
 
-    bool chunkExists(int n)
+    bool ChunkExists(int x, int z)
     {
-        for(int i =0; i < activeChunks.Count; ++i)
+        bool exists = false;
+        foreach(GameObject go in activeChunks.ToArray())
         {
-            if(activeChunks[i].GetComponent<Chunk>().cd.chunkID == n)
+            Vector2 tempArrayPos = new Vector2(x,z);
+            ChunkData test = go.GetComponent<Chunk>().cd;
+            Vector2 arrayPos2 = new Vector2(go.GetComponent<Chunk>().cd.arrayPos.x, go.GetComponent<Chunk>().cd.arrayPos.y);
+            if(arrayPos2 == tempArrayPos)
             {
-                return false;
+                exists = true;
             }
         }
-        return true;
+        return exists;
+    }
+
+    void AssignActiveChunk()
+    {
+        foreach (GameObject c in activeChunks.ToArray())
+        {
+            if (c.GetComponent<Chunk>().GetWorldSpaceBounds().Contains(PlayerManager.instance.GetPlayer().transform.position))
+            {
+                Debug.Log("Player in new chunk!");
+                activeChunk = c.GetComponent<Chunk>();
+                newActiveChunk = true;
+            }
+        }
+    }
+
+    void FindActiveChunk()
+    {
+        foreach(GameObject c in activeChunks.ToArray())
+        {
+            Vector3 playerPos = PlayerManager.instance.GetPlayer().gameObject.transform.position;
+            Vector3 chunkPos = c.GetComponent<Chunk>().gameObject.transform.position;
+            Bounds chunkSize = c.GetComponent<Chunk>().GetWorldSpaceBounds();
+            if (playerPos.x >= chunkPos.x && playerPos.x <= chunkPos.x + chunkSize.size.x &&
+                playerPos.z >= chunkPos.z && playerPos.z <= chunkPos.z + chunkSize.size.z)
+            {
+                activeChunk = c.GetComponent<Chunk>();
+                newActiveChunk = true;
+                Debug.Log("New Active Chunk Found!" + activeChunk.cd.arrayPos);
+            }
+        }
+    }
+
+    bool PlayerInside()
+    {
+        Vector3 playerPos = PlayerManager.instance.GetPlayer().gameObject.transform.position;
+        Vector3 chunkPos = activeChunk.GetComponent<Chunk>().gameObject.transform.position;
+        Bounds chunkSize = activeChunk.GetComponent<Chunk>().GetWorldSpaceBounds();
+        if (playerPos.x >= chunkPos.x && playerPos.x <= chunkPos.x + chunkSize.size.x &&
+            playerPos.z >= chunkPos.z && playerPos.z <= chunkPos.z + chunkSize.size.z)
+        {
+            return true;
+        }
+        else
+        {
+            
+            return false;
+        }
+    }
+
+    void LoadNeighbours()
+    {
+        Debug.Log("Loading Neighbours");
+        for(int i = 0; i < activeChunk.cd.chunkNeighbour.Length; ++i)
+        {
+            if(activeChunk.cd.chunkNeighbour[i].x != -1 || activeChunk.cd.chunkNeighbour[i].y != -1)
+            {
+                if(!ChunkExists((int)activeChunk.cd.chunkNeighbour[i].x, (int)activeChunk.cd.chunkNeighbour[i].y))
+                {
+                    GenerateChunk((int)activeChunk.cd.chunkNeighbour[i].x, (int)activeChunk.cd.chunkNeighbour[i].y);
+                }
+            }
+        }
     }
 }

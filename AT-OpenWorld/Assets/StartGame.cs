@@ -7,6 +7,9 @@ public class StartGame : MonoBehaviour
     [SerializeField]private GameObject playerPrefab;
     public GameObject Player;
     float timer = 0.5f;
+    public int x;
+    public int y;
+
     void Start()
     {
         
@@ -14,19 +17,19 @@ public class StartGame : MonoBehaviour
 
     private void Update()
     {
-        if(timer > 0)
+        if(Input.GetKeyDown(KeyCode.M))
         {
-            timer -= Time.deltaTime;
+            ChunkManager.instance.StartGame(x,y);
         }
-        else
+
+        if (Input.GetKeyDown(KeyCode.P))
         {
-            ChunkManager.instance.GenerateChunk(ChunkManager.instance.startChunk);
-            
-            
             PlayerManager.instance.SpawnPlayer();
-            Destroy(this);
-        }   
+        }
+
+        if (Input.GetKeyDown(KeyCode.N))
+        {
+            //ChunkManager.instance.GenerateChunk(2, 3);
+        }
     }
-
-
 }

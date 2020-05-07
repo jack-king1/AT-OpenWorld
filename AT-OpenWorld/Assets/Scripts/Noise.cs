@@ -4,66 +4,7 @@ using UnityEngine;
 
 public static class Noise
 {
-    public static float [,] GenerateNoise(float xSize, float zSize, float scale, int octaves, 
-        float persistance, float lacunarity)
-    {
-        float[,] noiseMap = new float[(int)xSize + 1,(int)zSize + 1];
-        float[,] fallOffMap = FallOffGenerator.GenerateFallOffMap((int)xSize);
-
-        float maxNoiseHeight = float.MinValue;
-        float minNoiseHeight = float.MaxValue;
-
-        if(scale <= 0)
-        {
-            scale = 0.0001f;
-        }
-
-        for(float z = 0f; z < zSize; ++z)
-        {
-            for(float x = 0f; x < xSize; ++x)
-            {
-
-                float amplitude = 1;
-                float frequency = 1;
-                float noiseHeight = 0;
-
-                for(int i = 0; i < octaves; ++i)
-                {
-                    float sampleX = x / scale * frequency;
-                    float sampleZ = z / scale * frequency;
-
-                    float perlinValue = Mathf.PerlinNoise(sampleX, sampleZ) * 2 - 1;
-                    noiseHeight += perlinValue * amplitude;
-
-                    amplitude *= persistance;
-                    frequency *= lacunarity;
-                }
-
-                if(noiseHeight > maxNoiseHeight)
-                {
-                    maxNoiseHeight = noiseHeight;
-                }
-                else if(noiseHeight< minNoiseHeight)
-                {
-                    minNoiseHeight = noiseHeight;
-                }
-                noiseMap[(int)x, (int)z] = noiseHeight;
-            }
-        }
-
-        for (float z = 0f; z < zSize; ++z)
-        {
-            for (float x = 0f; x < xSize; ++x)
-            {
-                //NORMALIZE
-                noiseMap[(int)x, (int)z] = 
-                    Mathf.InverseLerp(minNoiseHeight, maxNoiseHeight, noiseMap[(int)x, (int)z]);
-            }
-        }
-        //DataManager.SaveNoiseMapData(noiseMap);
-        GenerateTextureFile(noiseMap);
-        return noiseMap;
-    }
+    
 
     public static void GenerateTextureFile(float[,] noiseMap)
     {
@@ -109,10 +50,11 @@ public static class Noise
         DataManager.SaveNoiseMapData(bytes, name);
     }
 
-    public static void GenerateNoiseTest(float xSize, float zSize, float scale, int octaves,
+    public static void GenerateNoiseTest(int size, float scale, int octaves,
     float persistance, float lacunarity)
     {
-        float[,] noiseMap = new float[(int)xSize + 1, (int)zSize + 1];
+        Debug.Log("@GenerateNoiseTest");
+        HeightMapGenerator.noiseMap = new float[size, size];
         float maxNoiseHeight = float.MinValue;
         float minNoiseHeight = float.MaxValue;
 
@@ -121,9 +63,9 @@ public static class Noise
             scale = 0.0001f;
         }
 
-        for (float z = 0f; z < zSize; ++z)
+        for (float z = 0f; z < size; ++z)
         {
-            for (float x = 0f; x < xSize; ++x)
+            for (float x = 0f; x < size; ++x)
             {
 
                 float amplitude = 1;
@@ -150,21 +92,20 @@ public static class Noise
                 {
                     minNoiseHeight = noiseHeight;
                 }
-                noiseMap[(int)x, (int)z] = noiseHeight;
+                HeightMapGenerator.noiseMap[(int)x, (int)z] = noiseHeight;
             }
         }
 
-        for (float z = 0f; z < zSize; ++z)
+        for (float z = 0f; z < size; ++z)
         {
-            for (float x = 0f; x < xSize; ++x)
+            for (float x = 0f; x < size; ++x)
             {
                 //NORMALIZE
-                noiseMap[(int)x, (int)z] =
-                    Mathf.InverseLerp(minNoiseHeight, maxNoiseHeight, noiseMap[(int)x, (int)z]);
+                HeightMapGenerator.noiseMap[(int)x, (int)z] = Mathf.InverseLerp(minNoiseHeight, maxNoiseHeight, HeightMapGenerator.noiseMap[(int)x, (int)z]);
             }
         }
-        CircularFallOff((int)xSize, ref noiseMap);
-        GenerateTextureFile(noiseMap);
+        CircularFallOff((int)size, ref HeightMapGenerator.noiseMap);
+        GenerateTextureFile(HeightMapGenerator.noiseMap);
     }
 
     static void CircularFallOff(int size, ref float[,] noiseMap)

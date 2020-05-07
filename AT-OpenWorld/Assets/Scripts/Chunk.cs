@@ -1,93 +1,111 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
 public class Chunk : MonoBehaviour
 {
     public ChunkData cd;
-
-    public AnimationCurve meshHeightCurve;
     [SerializeField] MeshCollider collider;
     public Mesh mesh;
-    public float[,] noiseMap;
     [SerializeField]private int chunkID;
-    private bool loadedFromFile;
+    public ThreadQueuer tq;
+    float[,] localNoiseMap;
 
-    public IEnumerator BuildChunk(int _chunkID)
+    //Pathfinding
+    public GameObject GridObject;
+
+    private void Start()
     {
+        gameObject.layer = 8;
+        tq = gameObject.GetComponent<ThreadQueuer>();
+        CreateGrid();
+    }
+
+    public void BuildChunk(int x, int z)
+    {
+        Debug.Log("@BuildChunk. Building Chunk: " + x.ToString() + z.ToString());
         cd = new ChunkData();
-        //Check to see if chunk already has json. 
-        if (DataManager.FileExist(_chunkID))
+        tq = gameObject.GetComponent<ThreadQueuer>();
+        //Check to see if chunk already has json.
+        if (DataManager.FileExist(x,z) )
         {
-            Debug.Log("Loading From File: Chunk " + _chunkID.ToString());
-            loadedFromFile = true;
-            cd = DataManager.LoadChunkData(_chunkID);
             gameObject.GetComponent<MeshRenderer>().material = ColourMapData.instance.mat;
-            GetHeightMap();
-            GenerateAnimationCurve();
-            CreateMesh();
-            chunkID = cd.chunkID;
-            transform.position = cd.position;
+            LoadChunk(x,z);
         }
         else
         {
-            cd.chunkID = _chunkID;
-            chunkID = _chunkID;
             gameObject.GetComponent<MeshRenderer>().material = ColourMapData.instance.mat;
-            float[] dimensions = HeightMapGenerator.GetChunkDimensions();
-            cd.xSize = (int)dimensions[0];
-            cd.zSize = (int)dimensions[1];
-            SetChunkPosition(_chunkID);
-            GetHeightMap();
-            GetcolourMap();
-            GenerateAnimationCurve();
+            cd.size = (int)ChunkManager.instance.chunkSize;
+            SetChunkPosition(x,z);
+            GetLocalHeightMap();
+            GetLocalColourMap();
+            //GetcolourMap();
             CreateMesh();
             cd.position.x = transform.position.x;
             cd.position.z = transform.position.z;
             SetChunkNeighbours();
-            CreateJSONFile();
-
+            CreateJSONFile(x,z);
+            ChunkManager.instance.AddChunkToList(gameObject);
         }
-            yield break;
     }
 
-    private void GetHeightMap()
+    private void GetcolourMap()
     {
-        //Get height map from texture2D created from png in Noise.cs.
-        Texture2D nm = HeightMapGenerator.GetHeightMap();
-        noiseMap = new float[cd.xSize +1, cd.zSize+1];
-       // Debug.Log("NoiseMap Size: " + noiseMap.Length);
-        for(int x = 0; x < cd.xSize; ++x)
+        //assign a random colouir //old colour map.
+        cd.meshColor = new Color[(cd.size + 1) * (cd.size + 1)];
+        int colourCount = 0;
+        Color assignedColour = new Color(Random.Range(0F, 1F), Random.Range(0, 1F), Random.Range(0, 1F));
+        for (int z = 0; z <= cd.size; ++z)
         {
-            for(int z = 0; z < cd.zSize; ++z)
+            for (int x = 0; x <= cd.size; ++x)
             {
-                int xPos = x + ((int)cd.offset.x * cd.xSize);
-                int zPos = z + ((int)cd.offset.y * cd.zSize);
-                noiseMap[x, z] = nm.GetPixel( xPos, zPos).grayscale;
+                cd.meshColor[colourCount] = assignedColour;
+                ++colourCount;
             }
         }
     }
-    private void GetcolourMap()
+
+    private void GetLocalColourMap()
     {
-        cd.colourMap = new Color[(cd.xSize + 1) * (cd.zSize + 1)];
+        cd.meshColor = new Color[(cd.size + 1) * (cd.size + 1)];
         int colourCount = 0;
-        for (int z = 0; z <= cd.zSize; ++z)
+        for (int z = 0; z <= cd.size; ++z)
         {
-            for (int x = 0; x <= cd.xSize; ++x)
+            for (int x = 0; x <= cd.size; ++x)
             {
-                float currentHeight = noiseMap[x, z];
+                float currentHeight = localNoiseMap[x, z];
                 for (int i = 0; i < ColourMapData.instance.regions.Length; ++i)
                 {
                     if (currentHeight <= ColourMapData.instance.regions[i].height)
                     {
-                        //Debug.Log("Vertex Count: " + colourCount + "Current Vertex Height: " + currentHeight + " Name: " + regions[i].name);
-                        cd.colourMap[colourCount] = ColourMapData.instance.regions[i].colour;
+                        cd.meshColor[colourCount] = ColourMapData.instance.regions[i].colour;
                     }
                 }
                 ++colourCount;
             }
         }
+        bool fam = false;
+    }
+
+    private void GetLocalHeightMap()
+    {
+        //Get height map from texture2D created from png in Noise.cs.
+        Texture2D nm = HeightMapGenerator.GetHeightMap();
+        localNoiseMap = new float[cd.size + 1, cd.size + 1];
+        // Debug.Log("NoiseMap Size: " + noiseMap.Length);
+        for (int x = 0; x <= cd.size; ++x)
+        {
+            for (int z = 0; z <= cd.size; ++z)
+            {
+                int xPos = x + ((int)cd.arrayPos.x * cd.size);
+                int zPos = z + ((int)cd.arrayPos.y * cd.size);
+                localNoiseMap[x, z] = nm.GetPixel(xPos, zPos).grayscale;
+            }
+        }
+
+        bool fam = false;
     }
 
     private void CreateMesh()
@@ -95,82 +113,140 @@ public class Chunk : MonoBehaviour
         GetComponent<MeshFilter>().mesh = mesh = new Mesh();
         collider = GetComponent<MeshCollider>();
         mesh.name = "Procedural Grid";
-        cd.vertices = new Vector3[(cd.xSize + 1) * (cd.zSize + 1)];
-        Vector2[] uv = new Vector2[cd.vertices.Length];
-        Vector4[] tangents = new Vector4[cd.vertices.Length];
-        Vector4 tangent = new Vector4(1f, 0f, 0f, -1f);
+        cd.vertices = new Vector3[(cd.size + 1) * (cd.size + 1)];
+        cd.uv = new Vector2[cd.vertices.Length];
+        cd.tangents = new Vector4[cd.vertices.Length];
+        cd.tangent = new Vector4(1f, 0f, 0f, -1f);
 
-        for (int i = 0, z = 0; z <= cd.zSize; z++)
+        for (int i = 0, z = 0; z <= cd.size; z++)
         {
-            for (int x = 0; x <= cd.xSize; x++, i++)
+            for (int x = 0; x <= cd.size ; x++, i++)
             {
-                cd.vertices[i] = new Vector3(x, meshHeightCurve.Evaluate(noiseMap[x, z]) * cd.meshHeightMultiplier, z);
-                uv[i] = new Vector2((float)x / cd.xSize, (float)z / cd.zSize);
-                tangents[i] = tangent;
+                float evHeight = HeightMapGenerator.instance.ac.Evaluate(localNoiseMap[x, z]);
+                cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing - (cd.size * ChunkManager.instance.verticySpaceing / 2),
+                    (evHeight * HeightMapGenerator.instance.meshHeightMultiplier),
+                    (z * ChunkManager.instance.verticySpaceing) - (cd.size * ChunkManager.instance.verticySpaceing / 2));
+
+                //cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing,
+                //    0,
+                //    z * ChunkManager.instance.verticySpaceing);
+
+
+                //cd.vertices[i] = new Vector3(x * ChunkManager.instance.verticySpaceing,
+                //    0,
+                //     z * ChunkManager.instance.verticySpaceing);
+
+
+                cd.uv[i] = new Vector2((float)x / cd.size, (float)z / cd.size);
+                cd.tangents[i] = cd.tangent;
             }
         }
 
         mesh.vertices = cd.vertices;
-        mesh.uv = uv;
-        mesh.tangents = tangents;
-        int[] triangles = new int[cd.xSize * cd.zSize * 6];
-        for (int ti = 0, vi = 0, z = 0; z < cd.zSize; z++, vi++)
+        mesh.uv = cd.uv;
+        mesh.tangents = cd.tangents;
+        cd.triangles = new int[cd.size * cd.size * 6];
+        for (int ti = 0, vi = 0, z = 0; z < cd.size; z++, vi++)
         {
-            for (int x = 0; x < cd.xSize; x++, ti += 6, vi++)
+            for (int x = 0; x < cd.size; x++, ti += 6, vi++)
             {
-                triangles[ti] = vi;
-                triangles[ti + 3] = triangles[ti + 2] = vi + 1;
-                triangles[ti + 4] = triangles[ti + 1] = vi + cd.xSize + 1;
-                triangles[ti + 5] = vi + cd.xSize + 2;
+                cd.triangles[ti] = vi;
+                cd.triangles[ti + 3] = cd.triangles[ti + 2] = vi + 1;
+                cd.triangles[ti + 4] = cd.triangles[ti + 1] = vi + cd.size + 1;
+                cd.triangles[ti + 5] = vi + cd.size + 2;
             }
         }
-        mesh.colors = cd.colourMap;
-        mesh.triangles = triangles;
+        mesh.colors = cd.meshColor;
+        mesh.triangles = cd.triangles;
         mesh.RecalculateNormals();
         collider.sharedMesh = mesh;
     }
 
-    private void GenerateAnimationCurve()
+    void SetChunkPosition(int x, int z)
     {
-        if (meshHeightCurve == null)
-        {
-            meshHeightCurve = new AnimationCurve(new Keyframe(0, 0),new Keyframe(0.3f,0), new Keyframe(1, 1));
-        }
-        meshHeightCurve.preWrapMode = WrapMode.Clamp;
-        meshHeightCurve.postWrapMode = WrapMode.Clamp;
+        cd.arrayPos = new Vector2(x, z);
+
+        gameObject.transform.position = new Vector3((x * (cd.size * ChunkManager.instance.verticySpaceing)), 0, 
+            z * (cd.size * ChunkManager.instance.verticySpaceing));
     }
 
-    void SetChunkPosition(int chunkID)
+    public void UnloadChunk()
     {
-        float rowAmount = Mathf.Sqrt(ChunkManager.instance.mapChunkTotal);
-        float x = 0;
-        float z = 0;
-        if (chunkID == 0)
-        {
-            x = 0;
-        }
-        else
-        {
-            x = Mathf.FloorToInt((float)(chunkID) / rowAmount);
-            z = (chunkID) % rowAmount;
-        }
-
-        cd.offset = new Vector2(x, z);
-
-        Vector3 newPos = new Vector3(x * cd.xSize, 0, z * cd.zSize);
-        gameObject.transform.position = newPos;
-        cd.position = newPos;
+        string path = DataManager.CreateChunkFilepath((int)cd.arrayPos.x, (int)cd.arrayPos.y);
+        tq.StartThreadedFunction(() => { SaveChunkData(this.cd, path); });
     }
 
-    void UnloadChunk()
+    void DestroyChunk()
     {
-        DataManager.UnloadChunkData(this.cd);
         Destroy(this.gameObject);
     }
 
-    void CreateJSONFile()
+    public void LoadChunk(int x, int z)
     {
-        DataManager.UnloadChunkData(this.cd);
+        if (DataManager.FileExist(x, z))
+        {
+            string path = DataManager.CreateChunkFilepath(x,z);
+            Debug.Log("Starting Thread For Loading:" + x.ToString() + z.ToString());
+            tq.StartThreadedFunction(() => { LoadChunkData(path); });
+        }
+        else
+        {
+            Debug.Log("No Chunk With That File Name.");
+        }
+    }
+
+    public void LoadChunkData(string path)
+    {
+        Debug.Log("@LoadingChunkData");
+        ChunkData newChunk;
+        string json = File.ReadAllText(path);
+        newChunk = JsonUtility.FromJson<ChunkData>(json);
+        tq.QueueMainThreadFunction(() => AssignChunkData(newChunk));
+    }
+    public void SaveChunkData(ChunkData cd, object FilePath)
+    {
+        Debug.Log("@SavingChunkData");
+        string json = JsonUtility.ToJson(cd);
+        File.WriteAllText(FilePath.ToString(), json);
+        tq.QueueMainThreadFunction(() => DestroyChunk());
+    }
+
+    void CreateJSONFile(int x, int z)
+    {
+        //DataManager.UnloadChunkData(this.cd);
+        string path = DataManager.CreateChunkFilepath(x,z);
+        DataManager.CreateDirectory(x,z);
+        tq.StartThreadedFunction(() => { DataManager.SaveChunk(this.cd, path ); });
+    }
+
+    public void AssignChunkData(ChunkData _cd)
+    {
+        Debug.Log("@Assigning Chunk Data with position as: " + cd.position + "Array ID: " + cd.arrayPos);
+        cd = _cd;
+        Debug.Log(cd.position);
+        CreateMeshFromFile();
+    }
+
+    public void CreateMeshFromFile()
+    {
+        gameObject.transform.position = cd.position;
+        if (cd != null)
+        {
+            collider = GetComponent<MeshCollider>();
+            GetComponent<MeshFilter>().mesh = mesh = new Mesh();
+            mesh.vertices = cd.vertices;
+            mesh.uv = cd.uv;
+            mesh.tangents = cd.tangents;
+            mesh.colors = cd.meshColor;
+            mesh.triangles = cd.triangles;
+            mesh.RecalculateNormals();
+            collider.sharedMesh = mesh;
+        }
+        else
+        {
+            Debug.Log("Chunk Data is NULL");
+        }
+        ChunkManager.instance.AddChunkToList(gameObject);
     }
 
     public Bounds GetWorldSpaceBounds()
@@ -181,97 +257,105 @@ public class Chunk : MonoBehaviour
     void SetChunkNeighbours()
     {
         int size = (int)Mathf.Sqrt(ChunkManager.instance.mapChunkTotal);
-        
-        cd.chunkNeighbour = new int[8];
-        cd.chunkNeighbour[(int)directions.N] = cd.chunkID + 1;
-        cd.chunkNeighbour[(int)directions.S] = cd.chunkID - 1;
-        cd.chunkNeighbour[(int)directions.E] = cd.chunkID + size;
-        cd.chunkNeighbour[(int)directions.W] = cd.chunkID - size;
-        cd.chunkNeighbour[(int)directions.NE] = (cd.chunkID + 1) + size;
-        cd.chunkNeighbour[(int)directions.SW] = (cd.chunkID - 1) - size;
-        cd.chunkNeighbour[(int)directions.SE] = (cd.chunkID - 1) + size;
-        cd.chunkNeighbour[(int)directions.NW] = (cd.chunkID + 1) - size;
-
         size -= 1;
-        if (cd.offset.x == 0 || cd.offset.y == 0 ||
-            cd.offset.x == size || cd.offset.y == size)
+        
+        cd.chunkNeighbour = new Vector2[8];
+
+        if(cd.arrayPos.y < size)
         {
-            if(cd.offset.x == 0)
-            {
-                if (cd.offset.y == 0)
-                {
-                    //bottomleft corner.
-                    cd.chunkNeighbour[(int)directions.NW] = -1;
-                    cd.chunkNeighbour[(int)directions.SE] = -1;
-                    cd.chunkNeighbour[(int)directions.S] = -1;
-                    cd.chunkNeighbour[(int)directions.SW] = -1;
-                    cd.chunkNeighbour[(int)directions.W] = -1;
-                }
-                else if (cd.offset.y == size)
-                {
-                    //topleft corner.
-                    cd.chunkNeighbour[(int)directions.N] = -1;
-                    cd.chunkNeighbour[(int)directions.NE] = -1;
-                    cd.chunkNeighbour[(int)directions.SW] = -1;
-                    cd.chunkNeighbour[(int)directions.W] = -1;
-                    cd.chunkNeighbour[(int)directions.NW] = -1;
-                }
-                else if (cd.offset.y > 0)
-                {
-                    //Middle Left
-                    cd.chunkNeighbour[(int)directions.W] = -1;
-                    cd.chunkNeighbour[(int)directions.SW] = -1;
-                    cd.chunkNeighbour[(int)directions.NW] = -1;
-                }
-            }
-            else if(cd.offset.x == size)
-            {
-                if (cd.offset.y == 0)
-                {
-                    //Bottomright corner.
-                    cd.chunkNeighbour[(int)directions.NE] = -1;
-                    cd.chunkNeighbour[(int)directions.E] = -1;
-                    cd.chunkNeighbour[(int)directions.SE] = -1;
-                    cd.chunkNeighbour[(int)directions.S] = -1;
-                    cd.chunkNeighbour[(int)directions.SW] = -1;
-                }
-                else if (cd.offset.y == size)
-                {
-                    //Topright corner.
-                    cd.chunkNeighbour[(int)directions.N] = -1;
-                    cd.chunkNeighbour[(int)directions.NE] = -1;
-                    cd.chunkNeighbour[(int)directions.E] = -1;
-                    cd.chunkNeighbour[(int)directions.NW] = -1;
-                    cd.chunkNeighbour[(int)directions.SE] = -1;
-                }
-                else if (cd.offset.y > 0)
-                {
-                    //Middle right
-                    cd.chunkNeighbour[(int)directions.NE] = -1;
-                    cd.chunkNeighbour[(int)directions.E] = -1;
-                    cd.chunkNeighbour[(int)directions.SE] = -1;
-                }
-            }
-            else if(cd.offset.y == 0)
-            {
-                if(cd.offset.x > 0)
-                {
-                    //middle bottom aka 3
-                    cd.chunkNeighbour[(int)directions.SE] = -1;
-                    cd.chunkNeighbour[(int)directions.SW] = -1;
-                    cd.chunkNeighbour[(int)directions.S] = -1;
-                }
-            }
-            else if(cd.offset.y == size)
-            {
-                if (cd.offset.x > 0)
-                {
-                    //middle Top
-                    cd.chunkNeighbour[(int)directions.N] = -1;
-                    cd.chunkNeighbour[(int)directions.NE] = -1;
-                    cd.chunkNeighbour[(int)directions.NW] = -1;
-                }
-            }
+            cd.chunkNeighbour[(int)directions.N] = new Vector2(cd.arrayPos.x, cd.arrayPos.y + 1);
         }
+        else
+        {
+            cd.chunkNeighbour[(int)directions.N] = new Vector2(-1, -1);
+        }
+
+        if (cd.arrayPos.x < size && cd.arrayPos.y < size)
+        {
+            cd.chunkNeighbour[(int)directions.NE] = new Vector2(cd.arrayPos.x + 1, cd.arrayPos.y + 1);
+        }
+        else
+        {
+            cd.chunkNeighbour[(int)directions.NE] = new Vector2(-1, -1);
+        }
+
+        if (cd.arrayPos.x < size)
+        {
+            cd.chunkNeighbour[(int)directions.E] = new Vector2(cd.arrayPos.x + 1, cd.arrayPos.y);
+        }
+        else
+        {
+            cd.chunkNeighbour[(int)directions.E] = new Vector2(-1, -1);
+        }
+
+        if (cd.arrayPos.x < size && cd.arrayPos.y > 0)
+        {
+            cd.chunkNeighbour[(int)directions.SE] = new Vector2(cd.arrayPos.x + 1, cd.arrayPos.y - 1);
+        }
+        else
+        {
+            cd.chunkNeighbour[(int)directions.SE] = new Vector2(-1, -1);
+        }
+
+        if (cd.arrayPos.y > 0)
+        {
+            cd.chunkNeighbour[(int)directions.S] = new Vector2(cd.arrayPos.x, cd.arrayPos.y - 1);
+        }
+        else
+        {
+            cd.chunkNeighbour[(int)directions.S] = new Vector2(-1, -1);
+        }
+
+        if (cd.arrayPos.x > 0 && cd.arrayPos.y > 0)
+        {
+            cd.chunkNeighbour[(int)directions.SW] = new Vector2(cd.arrayPos.x - 1, cd.arrayPos.y - 1);
+        }
+        else
+        {
+            cd.chunkNeighbour[(int)directions.SW] = new Vector2(-1, -1);
+        }
+
+        if (cd.arrayPos.x > 0)
+        {
+            cd.chunkNeighbour[(int)directions.W] = new Vector2(cd.arrayPos.x - 1, cd.arrayPos.y);
+        }
+        else
+        {
+            cd.chunkNeighbour[(int)directions.W] = new Vector2(-1, -1);
+        }
+
+        if (cd.arrayPos.x > 0 && cd.arrayPos.y < size)
+        {
+            cd.chunkNeighbour[(int)directions.NW] = new Vector2(cd.arrayPos.x - 1, cd.arrayPos.y + 1);
+        }
+         else
+        {
+            cd.chunkNeighbour[(int)directions.NW] = new Vector2(-1, -1);
+        }
+    }
+
+    void CreateGrid()
+    {
+
+        GridObject = new GameObject("Pathfinding"); //This is to set the localtransform to 0,0,0 for the pathfinding.
+        GridObject.transform.SetParent(gameObject.transform);
+        GridObject.transform.SetParent(transform);
+        GridObject.transform.position = gameObject.GetComponent<Renderer>().bounds.center;
+        TempUnits();
+        GridObject.AddComponent<Grid>();
+        GridObject.GetComponent<Grid>().Init(ChunkManager.instance.verticySpaceing * ChunkManager.instance.chunkSize, 32);
+        GridObject.AddComponent<Pathfinding>();
+    }
+
+    void TempUnits()
+    {
+       GameObject seeker = Instantiate(Resources.Load("Prefabs/Seeker"), GridObject.transform, false) as GameObject;
+       GameObject target = Instantiate(Resources.Load("Prefabs/Target"), GridObject.transform, false) as GameObject;
+
+       target.transform.localPosition = new Vector3(-800, 1, -800);
+       seeker.transform.localPosition = new Vector3(800, 1, 800);
+
+       GameObject cube = Instantiate(Resources.Load("Prefabs/Cube"), GridObject.transform, false) as GameObject;
+        cube.transform.localPosition = new Vector3(-1100, 1, -1100);
     }
 }
